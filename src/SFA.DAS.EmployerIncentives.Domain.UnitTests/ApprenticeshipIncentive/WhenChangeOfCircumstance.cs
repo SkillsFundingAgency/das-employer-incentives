@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
             _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             _collectionPeriod = new CollectionPeriod(6, 2021);

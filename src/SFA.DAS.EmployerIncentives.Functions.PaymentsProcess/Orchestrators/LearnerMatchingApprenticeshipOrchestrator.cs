@@ -1,5 +1,5 @@
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.DurableTask;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System;
@@ -16,8 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [Function(nameof(LearnerMatchingApprenticeshipOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
+        [FunctionName(nameof(LearnerMatchingApprenticeshipOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var incentive = context.GetInput<ApprenticeshipIncentiveOutput>();
 
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 _logger.LogDebug("LearnerMatchingApprenticeshipOrchestrator Completed for Apprenticeship: {incentive}", incentive);
         }
 
-        private async Task SetSuccessfulLearnerMatch(TaskOrchestrationContext context, ApprenticeshipIncentiveOutput incentive, bool succeeded)
+        private async Task SetSuccessfulLearnerMatch(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive, bool succeeded)
         {
             await context.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
                 new SetSuccessfulLearnerMatchInput
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 });
         }
 
-        private static async Task CalculateDaysInLearning(TaskOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
+        private static async Task CalculateDaysInLearning(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
         {
             var activePeriod = await context.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null);
             
@@ -57,17 +57,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 new CalculateDaysInLearningInput {ApprenticeshipIncentiveId = incentive.Id, ActivePeriod = activePeriod});
         }
 
-        private static async Task PerformChangeOfCircumstances(TaskOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
+        private static async Task PerformChangeOfCircumstances(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
         {
             await context.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
                 new LearnerChangeOfCircumstanceInput(incentive.Id, incentive.ULN));
         }
 
-        private static async Task PerformLearnerMatch(TaskOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
+        private static async Task PerformLearnerMatch(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)
         {
-            await context.CallActivityAsync(nameof(LearnerMatchAndUpdate),
-                new LearnerMatchInput { ApprenticeshipIncentiveId = incentive.Id },
-                new TaskOptions(new TaskRetryOptions(new RetryPolicy(3, TimeSpan.FromSeconds(1)))));
+            await context.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate),
+                new RetryOptions(TimeSpan.FromSeconds(1), 3),
+                new LearnerMatchInput {ApprenticeshipIncentiveId = incentive.Id});
         }
     }
 }

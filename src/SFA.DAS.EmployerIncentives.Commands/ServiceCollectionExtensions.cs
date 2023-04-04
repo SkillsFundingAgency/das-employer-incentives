@@ -12,6 +12,7 @@ using Polly.Extensions.Http;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
@@ -32,7 +33,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -54,11 +54,13 @@ using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -349,17 +351,17 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             return services.AddScoped(p =>
             {
-                EmployerIncentivesDbContext dbContext;
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
-                var synchronizedStorageSession = unitOfWorkContext.Find<SynchronizedStorageSession>();
-                if(synchronizedStorageSession != null)
+                EmployerIncentivesDbContext dbContext;
+                try
                 {
+                    var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
                     var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
                     dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
-                else
+                catch (KeyNotFoundException)
                 {
                     var settings = p.GetService<IOptions<ApplicationSettings>>();
                     var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings.Value.DbConnectionString);

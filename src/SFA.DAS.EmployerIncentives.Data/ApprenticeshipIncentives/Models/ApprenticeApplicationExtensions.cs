@@ -18,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
                 return true;
             }
 
-            if (dateTimeService.UtcNow().Day < 27 &&
-                paymentDate.Value.Year == dateTimeService.UtcNow().Year &&
-                paymentDate.Value.Month == dateTimeService.UtcNow().Month)
+            if (dateTimeService.Now().Day < 27 &&
+                paymentDate.Value.Year == dateTimeService.Now().Year &&
+                paymentDate.Value.Month == dateTimeService.Now().Month)
             {
                 return true;
             }
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
                 return false;
             }
 
-            if (apprenticeApplication.LearningStoppedDate > dateTimeService.UtcNow())
+            if (apprenticeApplication.LearningStoppedDate > dateTimeService.Now())
             {
                 return false;
             }

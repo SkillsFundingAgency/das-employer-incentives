@@ -1,143 +1,143 @@
-//using AutoFixture;
-//using FluentAssertions;
-//using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-//using Moq;
-//using NUnit.Framework;
-//using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
-//using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using AutoFixture;
+using FluentAssertions;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Moq;
+using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
-//namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
-//{
-//    public class WhenCalculatingPaymentsForAccountLegalEntity
-//    {
-//        private Fixture _fixture;
-//        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
-//        private CalculatePaymentsForAccountLegalEntityOrchestrator _orchestrator;
-//        private AccountLegalEntityCollectionPeriod _accountLegalEntityCollectionPeriod;
-//        private List<PendingPaymentActivity> _pendingPayments;
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
+{
+    public class WhenCalculatingPaymentsForAccountLegalEntity
+    {
+        private Fixture _fixture;
+        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
+        private CalculatePaymentsForAccountLegalEntityOrchestrator _orchestrator;
+        private AccountLegalEntityCollectionPeriod _accountLegalEntityCollectionPeriod;
+        private List<PendingPaymentActivity> _pendingPayments;
 
-//        [SetUp]
-//        public void Setup()
-//        {
-//            // Arrange 
-//            _fixture = new Fixture();
-//            var collectionPeriod = _fixture.Create<CollectionPeriod>();
-//            var accountLegalEntityId = _fixture.Create<long>();
-//            _accountLegalEntityCollectionPeriod = new AccountLegalEntityCollectionPeriod { AccountLegalEntityId = accountLegalEntityId, CollectionPeriod = collectionPeriod };
-//            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
-//            _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriod);
+        [SetUp]
+        public void Setup()
+        {
+            // Arrange 
+            _fixture = new Fixture();
+            var collectionPeriod = _fixture.Create<CollectionPeriod>();
+            var accountLegalEntityId = _fixture.Create<long>();
+            _accountLegalEntityCollectionPeriod = new AccountLegalEntityCollectionPeriod { AccountLegalEntityId = accountLegalEntityId, CollectionPeriod = collectionPeriod };
+            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
+            _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriod);
 
-//            _pendingPayments = _fixture.CreateMany<PendingPaymentActivity>(3).ToList();
-//            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
+            _pendingPayments = _fixture.CreateMany<PendingPaymentActivity>(3).ToList();
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
 
-//            _orchestrator = new CalculatePaymentsForAccountLegalEntityOrchestrator();
-//        }
+            _orchestrator = new CalculatePaymentsForAccountLegalEntityOrchestrator();
+        }
 
-//        [Test]
-//        public async Task Then_query_is_called_to_get_pending_payments_for_the_legal_entity()
-//        {
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_query_is_called_to_get_pending_payments_for_the_legal_entity()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
-//        }
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
+        }
 
-//        [Test]
-//        public async Task Then_payment_is_created_after_validation_completes()
-//        {
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_payment_is_created_after_validation_completes()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            _mockOrchestrationContext.Verify(
-//                x => x.CallActivityAsync("CreatePayment",
-//                    It.Is<CreatePaymentInput>(y =>
-//                        y.ApprenticeshipIncentiveId == _pendingPayments[0].ApprenticeshipIncentiveId &&
-//                        y.PendingPaymentId == _pendingPayments[0].PendingPaymentId &&
-//                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[0].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[0].PendingPaymentId &&
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
 
-//            _mockOrchestrationContext.Verify(
-//                x => x.CallActivityAsync("CreatePayment",
-//                    It.Is<CreatePaymentInput>(y =>
-//                        y.ApprenticeshipIncentiveId == _pendingPayments[1].ApprenticeshipIncentiveId &&
-//                        y.PendingPaymentId == _pendingPayments[1].PendingPaymentId &&
-//                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[1].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[1].PendingPaymentId &&
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
 
-//            _mockOrchestrationContext.Verify(
-//                x => x.CallActivityAsync("CreatePayment",
-//                    It.Is<CreatePaymentInput>(y =>
-//                        y.ApprenticeshipIncentiveId == _pendingPayments[2].ApprenticeshipIncentiveId &&
-//                        y.PendingPaymentId == _pendingPayments[2].PendingPaymentId &&
-//                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
-//        }
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[2].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[2].PendingPaymentId &&
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
+        }
 
-//        [Test]
-//        public async Task Then_activity_is_called_to_validate_pending_payments_for_the_legal_entity()
-//        {
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_activity_is_called_to_validate_pending_payments_for_the_legal_entity()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            foreach (var p in _pendingPayments)
-//                _mockOrchestrationContext.Verify(
-//                    x => x.CallActivityAsync(nameof(ValidatePendingPayment), It.Is<ValidatePendingPaymentData>(
-//                        d => d.ApprenticeshipIncentiveId == p.ApprenticeshipIncentiveId
-//                        && d.PendingPaymentId == p.PendingPaymentId
-//                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
-//                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)),
-//                    Times.Once);
-//        }
+            foreach (var p in _pendingPayments)
+                _mockOrchestrationContext.Verify(
+                    x => x.CallActivityAsync(nameof(ValidatePendingPayment), It.Is<ValidatePendingPaymentData>(
+                        d => d.ApprenticeshipIncentiveId == p.ApprenticeshipIncentiveId
+                        && d.PendingPaymentId == p.PendingPaymentId
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
+                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)),
+                    Times.Once);
+        }
 
-//        [Test]
-//        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_a_ValidatePendingPaymentException()
-//        {
-//            // Arrange
-//            var failedValidation = _pendingPayments.First();
-//            var exceptionMessage = Guid.NewGuid().ToString();
-//            var testException = new AggregateException(new List<Exception>() { new ValidatePendingPaymentException(failedValidation.ApprenticeshipIncentiveId, failedValidation.PendingPaymentId, new Exception(exceptionMessage))});
+        [Test]
+        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_a_ValidatePendingPaymentException()
+        {
+            // Arrange
+            var failedValidation = _pendingPayments.First();
+            var exceptionMessage = Guid.NewGuid().ToString();
+            var testException = new AggregateException(new List<Exception>() { new ValidatePendingPaymentException(failedValidation.ApprenticeshipIncentiveId, failedValidation.PendingPaymentId, new Exception(exceptionMessage))});
             
-//            _mockOrchestrationContext
-//                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
-//                 , It.Is<ValidatePendingPaymentData>(
-//                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
-//                        && d.PendingPaymentId == failedValidation.PendingPaymentId
-//                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
-//                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
-//                .ThrowsAsync(testException);
+            _mockOrchestrationContext
+                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
+                 , It.Is<ValidatePendingPaymentData>(
+                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
+                        && d.PendingPaymentId == failedValidation.PendingPaymentId
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
+                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
+                .ThrowsAsync(testException);
 
-//            //Act
-//            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            //Act
+            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            //Assert
-//            return action.Should()
-//                .ThrowAsync<AggregateException>()
-//                .WithMessage($"Error ValidatePendingPayments (failed to validate ApprenticeshipIncentiveId : {failedValidation.ApprenticeshipIncentiveId}, PendingPaymentId : {failedValidation.PendingPaymentId}, Message : {exceptionMessage} )");
-//        }
+            //Assert
+            return action.Should()
+                .ThrowAsync<AggregateException>()
+                .WithMessage($"Error ValidatePendingPayments (failed to validate ApprenticeshipIncentiveId : {failedValidation.ApprenticeshipIncentiveId}, PendingPaymentId : {failedValidation.PendingPaymentId}, Message : {exceptionMessage} )");
+        }
 
-//        [Test]
-//        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_an_exception_other_than_a_ValidatePendingPaymentException()
-//        {
-//            // Arrange
-//            var failedValidation = _pendingPayments.First();
-//            var exceptionMessage = Guid.NewGuid().ToString();
-//            var testException = new Exception(exceptionMessage);
+        [Test]
+        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_an_exception_other_than_a_ValidatePendingPaymentException()
+        {
+            // Arrange
+            var failedValidation = _pendingPayments.First();
+            var exceptionMessage = Guid.NewGuid().ToString();
+            var testException = new Exception(exceptionMessage);
 
-//            _mockOrchestrationContext
-//                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
-//                 , It.Is<ValidatePendingPaymentData>(
-//                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
-//                        && d.PendingPaymentId == failedValidation.PendingPaymentId
-//                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
-//                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
-//                .ThrowsAsync(testException);
+            _mockOrchestrationContext
+                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
+                 , It.Is<ValidatePendingPaymentData>(
+                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
+                        && d.PendingPaymentId == failedValidation.PendingPaymentId
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
+                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
+                .ThrowsAsync(testException);
 
-//            //Act
-//            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            //Act
+            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            //Assert
-//            return action.Should()
-//                .ThrowAsync<Exception>()
-//                .WithMessage(exceptionMessage);
-//        }
-//    }
-//}
+            //Assert
+            return action.Should()
+                .ThrowAsync<Exception>()
+                .WithMessage(exceptionMessage);
+        }
+    }
+}

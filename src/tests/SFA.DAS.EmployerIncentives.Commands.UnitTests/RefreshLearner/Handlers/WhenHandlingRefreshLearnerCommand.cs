@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _censusDate = _testStartDate.AddDays(95);
 
             _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
             _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();

@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplication
         public void Arrange()
         {
             _mockDateTimeService = new Mock<IDateTimeService>();
-            _mockDateTimeService.Setup(x => x.UtcNow()).Returns(DateTime.Today);
+            _mockDateTimeService.Setup(x => x.Now()).Returns(DateTime.Today);
             _fixture = new Fixture();
             _sut = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeApplication>()
                 .With(x => x.FirstPaymentDate, DateTime.Today.AddMonths(-14).AddDays(90))

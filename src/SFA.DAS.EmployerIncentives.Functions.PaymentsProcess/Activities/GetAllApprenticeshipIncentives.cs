@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprenticeshipIncentives;
 
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _queryDispatcher = queryDispatcher;
         }
 
-        [Function(nameof(GetAllApprenticeshipIncentives))]
+        [FunctionName(nameof(GetAllApprenticeshipIncentives))]
         public async Task<List<ApprenticeshipIncentiveOutput>> Get([ActivityTrigger]object input)
         {
             var response = await _queryDispatcher.Send<GetApprenticeshipIncentivesRequest, GetApprenticeshipIncentivesResponse>(new GetApprenticeshipIncentivesRequest());

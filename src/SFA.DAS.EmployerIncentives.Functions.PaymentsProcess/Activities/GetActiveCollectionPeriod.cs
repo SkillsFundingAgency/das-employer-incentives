@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod;
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _queryDispatcher = queryDispatcher;
         }
 
-        [Function(nameof(GetActiveCollectionPeriod))]
+        [FunctionName(nameof(GetActiveCollectionPeriod))]
         public async Task<CollectionPeriod> Get([ActivityTrigger] object input)
         {
             var activePeriodDto = (await _queryDispatcher.Send<GetActiveCollectionPeriodRequest, GetActiveCollectionPeriodResponse>(new GetActiveCollectionPeriodRequest())).CollectionPeriod;

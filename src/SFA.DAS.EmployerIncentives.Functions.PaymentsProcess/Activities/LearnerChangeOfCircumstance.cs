@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;
         }
 
-        [Function(nameof(LearnerChangeOfCircumstanceActivity))]
+        [FunctionName(nameof(LearnerChangeOfCircumstanceActivity))]
         public async Task Update([ActivityTrigger] LearnerChangeOfCircumstanceInput input)
         {
             await _commandDispatcher.Send(new LearnerChangeOfCircumstanceCommand(input.ApprenticeshipIncentiveId));

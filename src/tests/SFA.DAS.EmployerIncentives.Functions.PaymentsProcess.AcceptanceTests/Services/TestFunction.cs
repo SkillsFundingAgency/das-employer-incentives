@@ -98,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                        .AddAzureStorageCoreServices()                       
                        .ConfigureServices(s =>
                        {
-                           //new Startup().Configure(builder);
+                           new Startup().Configure(builder);
 
                            s.Configure<MatchedLearnerApi>(l =>
                            {

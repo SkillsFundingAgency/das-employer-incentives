@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.ApprenticeshipIncentiveHasPossibleChangeOrCircs;
 
@@ -15,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _queryDispatcher = queryDispatcher;
         }
 
-        [Function(nameof(ApprenticeshipIncentiveHasPossibleChangeOrCircs))]
+        [FunctionName(nameof(ApprenticeshipIncentiveHasPossibleChangeOrCircs))]
         public async Task<bool> Get([ActivityTrigger] Guid apprenticeshipIncentiveId)
         {
             return (await _queryDispatcher.Send<ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest, ApprenticeshipIncentiveHasPossibleChangeOrCircsResponse>(new ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest(apprenticeshipIncentiveId))).HasPossibleChangeOfCircumstances;

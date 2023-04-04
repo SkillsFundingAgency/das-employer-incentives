@@ -1,6 +1,5 @@
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -14,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     public class WhenRunningLearnerMatchingApprenticeshipOrchestrator
     {
         private Fixture _fixture;
-        private Mock<TaskOrchestrationContext> _mockOrchestrationContext;
+        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private LearnerMatchingApprenticeshipOrchestrator _orchestrator;
         private ApprenticeshipIncentiveOutput _expectedInput;
 
@@ -22,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         public void Setup()
         {
             _fixture = new Fixture();
-            _mockOrchestrationContext = new Mock<TaskOrchestrationContext>();
+            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
             _expectedInput = _fixture.Create<ApprenticeshipIncentiveOutput>();
             _mockOrchestrationContext.Setup(x => x.GetInput<ApprenticeshipIncentiveOutput>()).Returns(_expectedInput);
             _orchestrator = new LearnerMatchingApprenticeshipOrchestrator(Mock.Of<ILogger<LearnerMatchingApprenticeshipOrchestrator>>());
@@ -34,9 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
             
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync(nameof(LearnerMatchAndUpdate),
-                    It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == _expectedInput.Id),
-                     It.IsAny<TaskOptions>()),
+                x => x.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate), It.IsAny<RetryOptions>(),
+                    It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == _expectedInput.Id)),
                 Times.Once);
         }
 
@@ -47,8 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             
             _mockOrchestrationContext.Verify(
                 x => x.CallActivityAsync(nameof(CalculateDaysInLearning),
-                    It.Is<CalculateDaysInLearningInput>(input => input.ApprenticeshipIncentiveId == _expectedInput.Id),
-                     It.IsAny<TaskOptions>()),
+                    It.Is<CalculateDaysInLearningInput>(input => input.ApprenticeshipIncentiveId == _expectedInput.Id)),
                 Times.Once);
         }
 
@@ -61,8 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                 x => x.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
                     It.Is<LearnerChangeOfCircumstanceInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
-                        input.Uln == _expectedInput.ULN),
-                        It.IsAny<TaskOptions>()), Times.Once);
+                        input.Uln == _expectedInput.ULN)), Times.Once);
         }
 
         [Test]
@@ -76,8 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
                         input.Succeeded == false
-                        ),
-                        It.IsAny<TaskOptions>()), Times.Once);
+                        )), Times.Once);
 
             _mockOrchestrationContext.Verify(
                 x => x.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
@@ -85,8 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
                         input.Succeeded == true
-                        ),
-                        It.IsAny<TaskOptions>()), Times.Once);
+                        )), Times.Once);
         }
     }
 }

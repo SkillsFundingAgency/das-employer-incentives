@@ -1,8 +1,9 @@
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.DurableTask;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,8 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [Function(nameof(IncentivePaymentOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
+        [FunctionName(nameof(IncentivePaymentOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var collectionPeriod = await context.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null);
 

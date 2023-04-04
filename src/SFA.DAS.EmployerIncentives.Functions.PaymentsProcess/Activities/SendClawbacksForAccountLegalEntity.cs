@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawbacks;
 using System;
@@ -15,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;            
         }
 
-        [Function(nameof(SendClawbacksForAccountLegalEntity))]
+        [FunctionName(nameof(SendClawbacksForAccountLegalEntity))]
         public async Task<bool> Send([ActivityTrigger] AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;

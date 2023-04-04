@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;
         }
 
-        [Function(nameof(CalculateDaysInLearning))]
+        [FunctionName(nameof(CalculateDaysInLearning))]
         public async Task Create([ActivityTrigger] CalculateDaysInLearningInput input)
         {
             await _commandDispatcher.Send(new CalculateDaysInLearningCommand(input.ApprenticeshipIncentiveId, input.ActivePeriod.Period, input.ActivePeriod.Year ));

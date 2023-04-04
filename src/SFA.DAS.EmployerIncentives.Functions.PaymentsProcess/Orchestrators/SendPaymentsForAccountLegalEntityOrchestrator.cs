@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.DurableTask;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 
@@ -17,8 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [Function(nameof(SendPaymentsForAccountLegalEntityOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
+        [FunctionName(nameof(SendPaymentsForAccountLegalEntityOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
 

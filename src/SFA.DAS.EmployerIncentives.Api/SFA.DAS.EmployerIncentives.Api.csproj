@@ -17,6 +17,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
     <ProjectReference Include="..\SFA.DAS.UnitOfWork.EntityFrameworkCore\SFA.DAS.UnitOfWork.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\SFA.DAS.UnitOfWork.NServiceBus\SFA.DAS.UnitOfWork.NServiceBus.csproj" />
   </ItemGroup>
 
 </Project>

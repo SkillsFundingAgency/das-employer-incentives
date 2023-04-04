@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Functions.Worker;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _commandDispatcher = commandDispatcher;
         }
 
-        [Function(nameof(ValidatePendingPayment))]
+        [FunctionName(nameof(ValidatePendingPayment))]
         public async Task Validate([ActivityTrigger] ValidatePendingPaymentData payment)
         {
             try

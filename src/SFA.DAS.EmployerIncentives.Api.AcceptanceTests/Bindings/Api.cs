@@ -2,6 +2,7 @@
 using NServiceBus;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;

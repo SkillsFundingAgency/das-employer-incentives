@@ -1,33 +1,28 @@
-using Microsoft.Azure.Functions.Worker;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
-using System.Threading.Tasks;
-using Microsoft.DurableTask.Client;
-using Microsoft.Azure.Functions.Worker.Http;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
-    public class IncentivePaymentOrchestratorHttpStart
+    public static class IncentivePaymentOrchestratorHttpStart
     {
-        private readonly ILogger _logger;
-
-        public IncentivePaymentOrchestratorHttpStart(ILoggerFactory loggerFactory)
+        [FunctionName("IncentivePaymentOrchestrator_HttpStart")]
+        public static async Task<HttpResponseMessage> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator")] HttpRequestMessage req,
+            [DurableClient] IDurableOrchestrationClient starter,
+            ILogger log)
         {
-            _logger = loggerFactory.CreateLogger<IncentivePaymentOrchestratorHttpStart>();
-        }
+            log.LogInformation($"Triggering IncentivePaymentOrchestrator for current active collection period");
 
-        [Function("IncentivePaymentOrchestrator_HttpStart")]
-        public async Task<HttpResponseData> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator")] HttpRequestData req,
-            [DurableClient] DurableTaskClient client)
-        {
-            _logger.LogInformation($"Triggering IncentivePaymentOrchestrator for current active collection period");
+            string instanceId = await starter.StartNewAsync(nameof(IncentivePaymentOrchestrator), null);
 
-            string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(nameof(IncentivePaymentOrchestrator), null);
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
-            _logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-
-            return client.CreateCheckStatusResponse(req, instanceId);
+            return starter.CreateCheckStatusResponse(req, instanceId);
         }
     }
 }
