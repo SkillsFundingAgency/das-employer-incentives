@@ -21,7 +21,7 @@ SELECT
     ,p.[PaymentPeriod]
     ,p.[PaymentYear]
     ,p.[Amount] as Amount
-    ,a.VrfVendorId
+    ,p.VrfVendorId
     ,ai.ULN
     ,case
         when ai.Phase = 'Phase1' then 1
@@ -40,7 +40,8 @@ SELECT
                 [SubNominalCode],
                 [PaymentPeriod],
                 [PaymentYear],
-                [Amount] 
+                [Amount],
+				        [VrfVendorId]
             from [incentives].[Payment] 
             union
             select 
@@ -53,14 +54,15 @@ SELECT
                 [SubNominalCode],
                 [CollectionPeriod] as [PaymentPeriod],
                 [CollectionPeriodYear] as [PaymentYear],
-                [Amount] 
+                [Amount],				
+				        [VrfVendorId]
             from [incentives].[ClawbackPayment]
         ) p
   left join [incentives].[PendingPayment] pp on pp.id=p.PendingPaymentId
   left join Accounts a on a.Id=p.AccountId and a.AccountLegalEntityId = p.AccountLegalEntityId
   left join [incentives].[ApprenticeshipIncentive] ai on ai.Id=p.ApprenticeshipIncentiveId
   where PaidDate is not null
-  and VrfVendorId not in (''
+  and p.VrfVendorId not in (''
   ----Replace with list of rejected payments from BC
   )
   order by PaymentYear desc, PaymentPeriod desc, SentToBCDate desc  
