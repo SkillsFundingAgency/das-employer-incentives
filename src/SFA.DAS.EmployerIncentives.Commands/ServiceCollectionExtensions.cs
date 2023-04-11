@@ -12,7 +12,6 @@ using Polly.Extensions.Http;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
@@ -61,9 +60,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.Account;
-using Azure.Storage.Blobs;
-using NServiceBus;
-using Microsoft.Azure.ServiceBus.Primitives;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
