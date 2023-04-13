@@ -404,7 +404,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided account legal entity does not exist.");
             }
 
-            var isValid = (!legalEntity.VendorBlockEndDate.HasValue || legalEntity.VendorBlockEndDate < DateTime.Now);
+            var isValid = (!legalEntity.VendorBlockEndDate.HasValue || legalEntity.VendorBlockEndDate < DateTime.UtcNow);
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.BlockedForPayments, isValid));
         }

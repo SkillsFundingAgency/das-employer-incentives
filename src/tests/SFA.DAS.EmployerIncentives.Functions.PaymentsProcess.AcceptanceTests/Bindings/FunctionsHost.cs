@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _testContext.TestFunction = new TestFunction(_testContext, $"TEST{_featureContext.FeatureInfo.Title}");
+            _testContext.TestFunction = new TestFunction(_testContext, $"TEST{_testContext.InstanceId.Substring(0,8)}{_featureContext.FeatureInfo.Title}");
             await _testContext.TestFunction.StartHost();
             stopwatch.Stop();
             Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");

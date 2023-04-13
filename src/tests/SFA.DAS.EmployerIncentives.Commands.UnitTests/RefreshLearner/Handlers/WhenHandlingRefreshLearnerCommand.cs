@@ -836,7 +836,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .Create()
                                     })
                             .With(pe => pe.AcademicYear, "2021")
-                            .With(pe => pe.StartDate, DateTime.Today.AddMonths(-20))
+                            .With(pe => pe.StartDate, _academicYear.EndDate.AddDays(-1))
                             .With(pe => pe.EndDate, (DateTime?)null)
                             .Create()
                             }).Create(),
@@ -916,7 +916,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                     })
                             .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.StartDate, startDate)
-                            .With(pe => pe.EndDate, (DateTime?)null)
+                            .With(pe => pe.EndDate, startDate.AddDays(365))
                             .Create()
                             }).Create(),
                         _fixture.Create<TrainingDto>()
