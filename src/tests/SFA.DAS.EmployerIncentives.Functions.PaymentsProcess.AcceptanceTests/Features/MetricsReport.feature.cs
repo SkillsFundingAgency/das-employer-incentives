@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = new string[] {
+        private static string[] featureTags = new string[] {
                 "activeCalendarPeriod"};
         
 #line 1 "MetricsReport.feature"
@@ -38,8 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "MetricsReport", "\tIn order to make approve payments once they have been validated\r\n\tAs a employer " +
-                    "incentives service\r\n\tI want to create a metrics report to be sent for approval", ProgrammingLanguage.CSharp, new string[] {
-                        "activeCalendarPeriod"});
+                    "incentives service\r\n\tI want to create a metrics report to be sent for approval", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -83,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When payment processing requires metrics approval", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When payment processing requires metrics approval", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden

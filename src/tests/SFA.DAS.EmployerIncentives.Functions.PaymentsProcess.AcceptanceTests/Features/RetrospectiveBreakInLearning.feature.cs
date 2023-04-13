@@ -463,7 +463,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Amend Retro BIL - Learner Stopped before First Payment due date and Resumed later" +
-                    " and Amended for Phase2", null, tagsOfScenario, argumentsOfScenario);
+                    " and Amended for Phase2", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 87
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
