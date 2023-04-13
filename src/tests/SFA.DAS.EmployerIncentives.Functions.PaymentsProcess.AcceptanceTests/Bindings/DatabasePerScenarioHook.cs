@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.TestFramework;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
 {
