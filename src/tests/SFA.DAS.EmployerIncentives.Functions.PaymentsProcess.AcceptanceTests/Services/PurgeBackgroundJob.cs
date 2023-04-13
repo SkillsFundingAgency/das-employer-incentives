@@ -21,6 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await _jobHost.Purge();
                 await Task.Delay(TimeSpan.FromSeconds(10));
             }
+
+            await _jobHost.Terminate();
         }
     }
 }

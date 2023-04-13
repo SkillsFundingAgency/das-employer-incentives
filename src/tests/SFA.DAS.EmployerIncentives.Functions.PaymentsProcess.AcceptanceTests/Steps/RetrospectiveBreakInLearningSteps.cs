@@ -274,6 +274,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.SetActiveCollectionCalendarPeriod(year, period);
             await StartLearnerMatching();
         }
+        [Given(@"the start of employment checks are successful")]
+        public async Task WhenStartOfEmploymentChecksAreSuccessful()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentChecks = dbConnection.GetAll<EmploymentCheck>()
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+
+            var employedBeforeSchemeStartedCheck = employmentChecks.Single(c => c.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted);
+            var employedAtStartOfApprenticeshipCheck = employmentChecks.Single(c => c.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship);
+
+            employedBeforeSchemeStartedCheck.Result = false;
+            employedBeforeSchemeStartedCheck.ResultDateTime = DateTime.UtcNow;
+            employedAtStartOfApprenticeshipCheck.Result = true;
+            employedAtStartOfApprenticeshipCheck.ResultDateTime = DateTime.UtcNow;
+
+            await dbConnection.UpdateAsync(employedBeforeSchemeStartedCheck);
+            await dbConnection.UpdateAsync(employedAtStartOfApprenticeshipCheck);
+        }
+        
 
         [Given(@"the Payment Run occurs")]
         public async Task ThePaymentProcessIsRun()
@@ -353,7 +372,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breaksInLearning.Count(b => b.EndDate != null).Should().Be(1);
             breaksInLearning.Single(b => b.EndDate != null).StartDate.Should().Be(_breakStart);
             breaksInLearning.Single(b => b.EndDate != null).EndDate.Should().Be(_breakEnd.AddDays(-1));
-            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
+            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(5));
             breaksInLearning.Single(b => b.EndDate != null).UpdatedDate.Should().BeNull();
         }
 

@@ -23,6 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
     public class TestContext : IDisposable
     {
+        public const string TestPrefix = "EITEST";
+
         public string InstanceId { get; private set; }
 
         public string SqlDataSource { get; private set; }
@@ -48,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
         public TestContext()
         {
-            InstanceId = Guid.NewGuid().ToString();
+            InstanceId = Guid.NewGuid().ToString().Replace("-", "");
             TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
             if (!TestDirectory.Exists)
             {

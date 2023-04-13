@@ -72,6 +72,7 @@ Scenario: Remove Retro BIL - Learner Stopped before First Payment due date and R
     And a payment of £1500 is not sent in Period R04 2122
     And Learner data is updated with a 28 day Break in Learning before the first payment due date
     And the Learner Match is run in Period R06 2122
+    And the start of employment checks are successful
     And the Payment Run occurs
     And the first pending payment of £1500 is paid in Period R06 2122
     And Learner data is updated with learning starting on 30-Nov-2021 and ending on 31-Jul-2023

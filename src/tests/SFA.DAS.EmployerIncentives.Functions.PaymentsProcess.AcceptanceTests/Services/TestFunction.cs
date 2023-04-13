@@ -138,7 +138,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;
                                a.LearnerServiceCacheIntervalInMinutes = _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes;
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
-                               a.ReportsContainerName = testContext.InstanceId;
+                               a.ReportsContainerName = $"{TestContext.TestPrefix}{testContext.InstanceId}".ToLower();
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
@@ -153,11 +153,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                        })
                        )
-                    .ConfigureServices(s =>
-                    {
-                        s.AddHostedService<PurgeBackgroundJob>();
-                    })                   
-                .Build();            
+                    //.ConfigureServices(s =>
+                    //{
+                    //    s.AddHostedService<PurgeBackgroundJob>();
+                    //})
+                .Build();
         }
 
         public async Task StartHost()
