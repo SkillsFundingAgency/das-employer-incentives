@@ -41,7 +41,7 @@ stages:
   jobs:
   - job: 'BuildAndUnitTest'
     pool:
-      name: 'DAS - Continuous Integration Beta'
+      name: 'DAS - Continuous Integration Agents'
       demands:
         - Agent.OS -equals Linux
     workspace:
