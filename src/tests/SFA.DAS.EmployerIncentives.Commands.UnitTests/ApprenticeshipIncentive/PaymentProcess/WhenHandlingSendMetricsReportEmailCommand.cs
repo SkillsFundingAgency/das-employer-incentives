@@ -14,11 +14,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PaymentProcess
 {
     public class WhenHandlingSendMetricsReportEmailCommand
     {
+        private Fixture _fixture;
         private SendMetricsReportEmailCommandHandler _sut;
         private Mock<ICommandPublisher> _mockCommandPublisher;
         private Mock<IOptions<EmailTemplateSettings>> _mockTemplateSettings;
@@ -30,16 +32,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private MetricsReport _metricsReport;
         private Domain.ValueObjects.CollectionPeriod _collectionPeriod;
         private string _emailAddress;
+        private double _validRecordsAmount;
+        private double _invalidRecordsAmount;
 
         [SetUp]
         public void Arrange()
         {
+            _fixture = new Fixture();
+
+            _validRecordsAmount = _fixture.Create<double>();
+            _invalidRecordsAmount = _fixture.Create<double>();
+
             _metricsReport = new MetricsReport
             {
                 ValidationSummary = new PeriodValidationSummary
                 {
-                    ValidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = 42000 },
-                    InvalidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = 84000 }
+                    ValidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = _validRecordsAmount },
+                    InvalidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = _invalidRecordsAmount }
                 },
                 CollectionPeriod = new Data.Reports.Metrics.CollectionPeriod { AcademicYear = "2324", Period = 8}
             };
@@ -144,11 +153,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             //Assert  
+            var expectedAmountToBePaid = Math.Round(_validRecordsAmount / 1000000, 2).ToString();
+            var expectedAmountFailingValidation = Math.Round(_validRecordsAmount / 1000000, 2).ToString();
             _mockCommandPublisher.Verify(m => m.Publish(It.Is<SendEmailWithAttachmentsCommand>(m => 
                 m.Tokens.ContainsKey("periodName") && m.Tokens["periodName"] == "R08" &&
                 m.Tokens.ContainsKey("academicYear") && m.Tokens["academicYear"] == "2324" &&
-                m.Tokens.ContainsKey("amountToBePaid") && m.Tokens["amountToBePaid"] == "42000" && 
-                m.Tokens.ContainsKey("amountFailingValidation") && m.Tokens["amountFailingValidation"] == "84000" &&
+                m.Tokens.ContainsKey("amountToBePaid") && m.Tokens["amountToBePaid"] == expectedAmountToBePaid && 
+                m.Tokens.ContainsKey("amountFailingValidation") && m.Tokens["amountFailingValidation"] == expectedAmountFailingValidation &&
                 m.Tokens.Count == 4), It.IsAny<CancellationToken>()), Times.Once);
         }
 

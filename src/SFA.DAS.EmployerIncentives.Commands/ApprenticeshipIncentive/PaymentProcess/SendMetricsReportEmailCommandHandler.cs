@@ -53,12 +53,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var templateId = _emailTemplates.MetricsReport.TemplateId;
 
+            var amountToBePaidInMillions = Math.Round(report.ValidationSummary.ValidRecords.PeriodAmount / 1000000, 2);
+            var amountFailingValidationInMillions = Math.Round(report.ValidationSummary.InvalidRecords.PeriodAmount / 1000000, 2);
+
             var personalisationTokens = new Dictionary<string, string>
             {
                 { CollectionPeriodToken, $"R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}" },
                 { AcademicYearToken, command.CollectionPeriod.AcademicYear.ToString() },
-                { AmountToBePaidToken, report.ValidationSummary.ValidRecords.PeriodAmount.ToString()},
-                { AmountFailingValidationToken, report.ValidationSummary.InvalidRecords.PeriodAmount.ToString() }
+                { AmountToBePaidToken, amountToBePaidInMillions.ToString()},
+                { AmountFailingValidationToken, amountFailingValidationInMillions.ToString() }
             };
 
             var reportFileInfo = new ReportsFileInfo($"{_configuration["EnvironmentName"]} {report.Name} R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{command.CollectionPeriod.AcademicYear}",
