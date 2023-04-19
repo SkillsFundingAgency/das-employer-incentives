@@ -86,7 +86,7 @@ stages:
         projects: |
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
- 
+
     - task: AzureCLI@2
       displayName: Build image using acr tasks
       inputs:
