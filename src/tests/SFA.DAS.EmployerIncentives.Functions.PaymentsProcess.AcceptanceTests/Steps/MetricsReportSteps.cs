@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheMetricsReportEmailsAreSent()
         {
             var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
-            var recentFiles = directoryInfo.GetFiles().Where(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
+            var recentFiles = directoryInfo.GetFiles().Where(x => x.CreationTimeUtc >= DateTime.UtcNow.AddMinutes(-2));
 
             recentFiles.Should().HaveCount(_testContext.PaymentProcessSettings.MetricsReportEmailList.Count);
 
