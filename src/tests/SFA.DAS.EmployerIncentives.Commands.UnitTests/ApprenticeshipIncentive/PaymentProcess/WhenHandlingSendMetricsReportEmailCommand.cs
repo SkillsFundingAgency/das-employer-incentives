@@ -12,8 +12,6 @@ using SFA.DAS.EmployerIncentives.Reports.Excel;
 using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -147,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             //Assert  
             _mockCommandPublisher.Verify(m => m.Publish(It.Is<SendEmailWithAttachmentsCommand>(m => 
-                m.Tokens.ContainsKey("periodName") && m.Tokens["periodName"] == "8" &&
+                m.Tokens.ContainsKey("periodName") && m.Tokens["periodName"] == "R08" &&
                 m.Tokens.ContainsKey("academicYear") && m.Tokens["academicYear"] == "2324" &&
                 m.Tokens.ContainsKey("amountToBePaid") && m.Tokens["amountToBePaid"] == "42000" && 
                 m.Tokens.ContainsKey("amountFailingValidation") && m.Tokens["amountFailingValidation"] == "84000" &&

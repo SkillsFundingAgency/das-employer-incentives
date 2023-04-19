@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var personalisationTokens = new Dictionary<string, string>
             {
-                { CollectionPeriodToken, command.CollectionPeriod.PeriodNumber.ToString() },
+                { CollectionPeriodToken, $"R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}" },
                 { AcademicYearToken, command.CollectionPeriod.AcademicYear.ToString() },
                 { AmountToBePaidToken, report.ValidationSummary.ValidRecords.PeriodAmount.ToString()},
                 { AmountFailingValidationToken, report.ValidationSummary.InvalidRecords.PeriodAmount.ToString() }

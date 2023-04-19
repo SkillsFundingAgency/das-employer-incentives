@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 {
                     var contents = File.ReadAllText(file.FullName, System.Text.Encoding.UTF8);
                     if (contents.Contains(email) &&
-                        contents.Contains("\"periodName\":\"6\"") &&
+                        contents.Contains("\"periodName\":\"R06\"") &&
                         contents.Contains("\"academicYear\":\"2021\"") &&
                         contents.Contains("\"metricsReportDownloadLink\":") &&
                         contents.Contains(_testContext.MetricsReportEmailGuid.ToString()))
