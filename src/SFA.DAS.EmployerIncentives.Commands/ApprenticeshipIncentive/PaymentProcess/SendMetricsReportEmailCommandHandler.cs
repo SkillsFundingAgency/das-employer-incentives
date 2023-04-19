@@ -53,15 +53,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var templateId = _emailTemplates.MetricsReport.TemplateId;
 
-            var amountToBePaidInMillions = Math.Round(report.ValidationSummary.ValidRecords.PeriodAmount / 1000000, 2);
-            var amountFailingValidationInMillions = Math.Round(report.ValidationSummary.InvalidRecords.PeriodAmount / 1000000, 2);
+            var amountToBePaidInMillions = FormatMetricsValueForEmail(report.ValidationSummary.ValidRecords.PeriodAmount); 
+            var amountFailingValidationInMillions = FormatMetricsValueForEmail(report.ValidationSummary.InvalidRecords.PeriodAmount);
 
             var personalisationTokens = new Dictionary<string, string>
             {
                 { CollectionPeriodToken, $"R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}" },
                 { AcademicYearToken, command.CollectionPeriod.AcademicYear.ToString() },
-                { AmountToBePaidToken, amountToBePaidInMillions.ToString()},
-                { AmountFailingValidationToken, amountFailingValidationInMillions.ToString() }
+                { AmountToBePaidToken, amountToBePaidInMillions},
+                { AmountFailingValidationToken, amountFailingValidationInMillions}
             };
 
             var reportFileInfo = new ReportsFileInfo($"{_configuration["EnvironmentName"]} {report.Name} R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{command.CollectionPeriod.AcademicYear}",
@@ -76,6 +76,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
             var sendEmailCommand = new SendEmailWithAttachmentsCommand(templateId, command.EmailAddress, personalisationTokens, attachments);
 
             await _commandPublisher.Publish(sendEmailCommand);
+        }
+
+        private string FormatMetricsValueForEmail(double amount)
+        {
+            if (amount < 1000000)
+            {
+                return $"{Math.Round(amount / 1000, 2)}k";
+            }
+
+            return $"{Math.Round(amount / 1000000, 2)}m";
         }
     }
 }
