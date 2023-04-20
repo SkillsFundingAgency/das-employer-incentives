@@ -387,7 +387,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            _incentive.FlushEvents().Count(e => e is LearningStopped).Should().Be(0);
+            _incentive.FlushEvents().Count(e => e is LearningStopped).Should().Be(1);
         }
 
         [Test]

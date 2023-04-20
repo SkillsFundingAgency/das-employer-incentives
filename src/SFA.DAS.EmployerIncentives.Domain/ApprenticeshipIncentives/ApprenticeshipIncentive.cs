@@ -199,12 +199,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             IDateTimeService dateTimeService)
         {
             var breaks = new List<BreakInLearning>();
-            for (var i = 0; i < periods.Count - 1; i++)
+            if (periods.Count == 1 && BreakInLearnings.Count < periods.Count)
             {
-                var start = periods[i].EndDate.AddDays(1);
-                var end = periods[i + 1].StartDate.AddDays(-1);
+                breaks.Add(new BreakInLearning(periods[0].EndDate.AddDays(1)));
+            }
+            else
+            {
+                for (var i = 0; i < periods.Count - 1; i++)
+                {
+                    var start = periods[i].EndDate.AddDays(1);
+                    var end = periods[i + 1].StartDate.AddDays(-1);
 
-                breaks.Add(BreakInLearning.Create(start, end));
+                    breaks.Add(BreakInLearning.Create(start, end));
+                }
             }
 
             if (breaks.SequenceEqual(BreakInLearnings)) return;
@@ -258,6 +265,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 ChangeStatus(IncentiveStatus.Stopped);
                 CalculateEarnings(collectionCalendar, learner);
+
+                AddEvent(new LearningStopped(
+                    Model.Id,
+                    stoppedStatus.DateStopped.Value));
             }
         }
 
