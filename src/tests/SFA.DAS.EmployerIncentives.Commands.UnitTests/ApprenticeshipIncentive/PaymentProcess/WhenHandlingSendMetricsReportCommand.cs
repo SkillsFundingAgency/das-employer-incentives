@@ -1,14 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using SFA.DAS.EmployerIncentives.Data.Reports;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PaymentProcess
@@ -20,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IReportsRepository> _mockReportsRepository;
         private IConfiguration _configuration;
         private Mock<IExcelReportGenerator<MetricsReport>> _mockExcelReportGenerator;
+        private Mock<IDomainEventDispatcher> _mockDomainEventDispatcher;        
         private MetricsReport _metricsReport;
         private Domain.ValueObjects.CollectionPeriod _collectionPeriod;
         private string _containerName;
@@ -34,6 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockReportsDataRepository = new Mock<IReportsDataRepository>();
             _mockReportsRepository = new Mock<IReportsRepository>();
             _mockExcelReportGenerator = new Mock<IExcelReportGenerator<MetricsReport>>();
+            _mockDomainEventDispatcher = new Mock<IDomainEventDispatcher>();
+
             _configuration = new ConfigurationBuilder()
                         .AddInMemoryCollection(new Dictionary<string, string>
                         {
@@ -43,13 +49,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockReportsDataRepository
                 .Setup(m => m.Execute<MetricsReport>())
-                .ReturnsAsync(_metricsReport);
+                .ReturnsAsync(_metricsReport);            
 
             _sut = new SendMetricsReportCommandHandler(
                 _mockReportsDataRepository.Object,
                 _mockReportsRepository.Object,
                 _mockExcelReportGenerator.Object,
-                _configuration);
+                _configuration,
+                _mockDomainEventDispatcher.Object);
         }
 
         [Test]
@@ -109,5 +116,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             _mockReportsRepository.Verify(m => m.Save(It.IsAny<ReportsFileInfo>(), ms), Times.Once);
         }
+
+        [Test]
+        public async Task Then_a_report_generated_event_is_raised()
+        {
+            //Arrange
+            var command = new SendMetricsReportCommand(_collectionPeriod);
+
+            using var ms = new MemoryStream();
+            _mockExcelReportGenerator
+                .Setup(m => m.Create(_metricsReport))
+                .Returns(ms);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _mockDomainEventDispatcher.Verify(m => m.Send(
+                It.Is<MetricsReportGenerated>( e => e.CollectionPeriod == command.CollectionPeriod), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
     }
 }

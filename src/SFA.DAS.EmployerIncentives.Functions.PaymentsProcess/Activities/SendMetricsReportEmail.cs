@@ -16,9 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         }
 
         [FunctionName(nameof(SendMetricsReportEmail))]
-        public async Task Complete([ActivityTrigger] SendMetricsReportEmailInput input)
+        public Task Complete([ActivityTrigger] SendMetricsReportEmailInput input)
         {
-            await _commandDispatcher.Send(new SendMetricsReportEmailCommand(new Domain.ValueObjects.CollectionPeriod(input.CollectionPeriod.Period, input.CollectionPeriod.Year), input.EmailAddress));
+            return _commandDispatcher.Send(new SendMetricsReportEmailCommand(new Domain.ValueObjects.CollectionPeriod(input.CollectionPeriod.Period, input.CollectionPeriod.Year), input.EmailAddress, input.ApprovalLink));
         }
     }
 }

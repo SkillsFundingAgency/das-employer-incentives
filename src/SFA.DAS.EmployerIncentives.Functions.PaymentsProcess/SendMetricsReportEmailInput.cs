@@ -4,5 +4,6 @@
     {
         public CollectionPeriod CollectionPeriod { get; set; }
         public string EmailAddress { get; set; }
+        public string ApprovalLink { get; set; }
     }
 }

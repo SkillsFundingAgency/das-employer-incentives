@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
         public async Task Start()
         {
-            StorageDirectory = new DirectoryInfo("C:\\temp\\learningtransport");
+            StorageDirectory = new DirectoryInfo(Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport"));
             if (!StorageDirectory.Exists)
             {
                 Directory.CreateDirectory(StorageDirectory.FullName);

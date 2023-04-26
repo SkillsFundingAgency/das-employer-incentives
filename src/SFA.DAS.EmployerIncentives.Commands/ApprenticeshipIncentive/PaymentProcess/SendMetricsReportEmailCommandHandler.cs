@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         private const string AmountToBePaidToken = "amountToBePaid";
         private const string AmountFailingValidationToken = "amountFailingValidation";
         private const string MetricsReportDownloadToken = "metricsReportDownloadLink";
-
+        private const string ApprovalLinkToken = "metricsReportApprovalLink";
 
         public SendMetricsReportEmailCommandHandler(IReportsDataRepository reportsDataRepository,
                                                     IReportsRepository reportsRepository,
@@ -61,7 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
                 { CollectionPeriodToken, $"R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}" },
                 { AcademicYearToken, command.CollectionPeriod.AcademicYear.ToString() },
                 { AmountToBePaidToken, amountToBePaidInMillions},
-                { AmountFailingValidationToken, amountFailingValidationInMillions}
+                { AmountFailingValidationToken, amountFailingValidationInMillions},
+                { ApprovalLinkToken, command.ApprovalLink}
             };
 
             var reportFileInfo = new ReportsFileInfo($"{_configuration["EnvironmentName"]} {report.Name} R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{command.CollectionPeriod.AcademicYear}",
@@ -86,6 +87,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
             }
 
             return $"{Math.Round(amount / 1000000, 2)}m";
-        }
+        }     
     }
 }

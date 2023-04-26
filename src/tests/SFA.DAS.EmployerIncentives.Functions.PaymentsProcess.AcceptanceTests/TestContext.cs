@@ -34,7 +34,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi PaymentsApi { get; set; }
 
         public BlobContainerClient BlobClient { get; set; }
-        
+
+        public List<PublishedCommand> CommandsPublished { get; set; }
+
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public readonly Guid MetricsReportEmailGuid = Guid.NewGuid();
@@ -56,6 +58,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
                 NServiceBusConnectionString = "UseLearningEndpoint=true",
                 UseLearningEndpointStorageDirectory = Path.Combine(TestDirectory.FullName, ".learningtransport"),
             };
+            TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
+            TestData.GetOrCreate("ThrowErrorAfterProcessedCommand", () => false);
+            CommandsPublished = new List<PublishedCommand>();
         }
 
         private bool _isDisposed;

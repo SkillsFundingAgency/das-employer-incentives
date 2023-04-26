@@ -28,10 +28,13 @@ using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Commands.Services.SlackApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.Types.PaymentProcess;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -59,7 +62,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -71,7 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddLearnerService()
-                .AddEmploymentCheckService();
+                .AddEmploymentCheckService()
+                .AddSlackNotificationClient();
 
             serviceCollection
                 .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
@@ -198,6 +201,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendMetricsReportCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SlackNotificationCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendMetricsReportEmailCommand>), new NullValidator());
 
             return serviceCollection;
@@ -294,7 +298,25 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
 
             return serviceCollection;
-        }        
+        }
+
+        private static IServiceCollection AddSlackNotificationClient(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<ISlackNotificationService>(s =>
+            {
+                var settings = s.GetService<IOptions<SlackApi>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                var client = clientBuilder.Build();
+                
+                return new SlackNotificationService(client, settings.WebHookUrl);
+            });
+
+            return serviceCollection;
+        }
 
         public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,

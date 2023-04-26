@@ -122,6 +122,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 13
  testRunner.And("the Metrics report emails are sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+#line 14
+ testRunner.And("a Slack message is posted to notify the Metrics report generation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
             }
             this.ScenarioCleanup();
         }

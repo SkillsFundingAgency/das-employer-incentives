@@ -15,13 +15,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
     public class IncentivePaymentOrchestrator
     {
         private readonly ILogger<IncentivePaymentOrchestrator> _logger;
-        private readonly IOptions<PaymentProcessSettings> _paymentProcessSettings;
 
-        public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger,
-            IOptions<PaymentProcessSettings> paymentProcessSettings)
+        public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger)
         {
             _logger = logger;
-            _paymentProcessSettings = paymentProcessSettings;
         }
 
         [FunctionName(nameof(IncentivePaymentOrchestrator))]
@@ -71,25 +68,32 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             context.SetCustomStatus("SendingMetricsReport");
             await context.CallActivityAsync(nameof(SendMetricsReport), new SendMetricsReportInput() { CollectionPeriod = collectionPeriod });
-
-            context.SetCustomStatus("SendingMetricsReportEmails");
-            var taskList = new List<Task>();
-            foreach (var email in _paymentProcessSettings.Value.MetricsReportEmailList.Where(t => !string.IsNullOrEmpty(t)))
-            {
-                taskList.Add(context.CallActivityAsync(nameof(SendMetricsReportEmail), new SendMetricsReportEmailInput { CollectionPeriod = collectionPeriod, EmailAddress = email}));
-            }
-
-            await Task.WhenAll(taskList);
-
+                        
+            var emailApprovalsTask = context.CallSubOrchestratorAsync<PaymentApprovalsOutput>(nameof(PaymentApprovalsOrchestrator), new PaymentApprovalsInput(collectionPeriod, context.InstanceId));
             context.SetCustomStatus("WaitingForPaymentApproval");
 
-            var paymentsApproved = await context.WaitForExternalEvent<bool>("PaymentsApproved");
-            if (!paymentsApproved)
+            var htppPaymentsApprovedTask = context.WaitForExternalEvent<bool>("PaymentsApproved");
+
+            if (emailApprovalsTask == await Task.WhenAny(htppPaymentsApprovedTask, emailApprovalsTask))
             {
-                context.SetCustomStatus("PaymentsRejected");
-                _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected", collectionPeriod);
-                return;
+                if (emailApprovalsTask.Result.PaymentApprovalResults.Any(r => r.PaymentApprovalStatus != PaymentApprovalStatus.Approved))
+                {
+                    context.SetCustomStatus("PaymentsRejected");
+                    _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected by one or more approvers", collectionPeriod);
+                    return;
+                }
             }
+            else // paymentsApprovedTask called
+            {
+                if (!htppPaymentsApprovedTask.Result)
+                {
+                    context.SetCustomStatus("PaymentsRejected");
+                    _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected via http endpoint", collectionPeriod);
+                    return;
+                }
+            }
+
+            context.SetCustomStatus("PaymentsApproved");
 
             context.SetCustomStatus("SendingClawbacksAndPayments");
             _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);
@@ -108,6 +112,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             context.SetCustomStatus("PaymentProcessingCompleted");
 
             _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
+        }
+
+        private static async Task PerformApprovalProcess(
+            IDurableOrchestrationContext context,
+            PaymentApprovalInput paymentApprovalInput)
+        {
+            await context.CallSubOrchestratorAsync(nameof(PaymentApprovalOrchestrator),
+                paymentApprovalInput);
         }
     }
 }

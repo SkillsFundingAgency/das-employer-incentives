@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,12 +10,14 @@ using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using static SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Extensions.BlobContainerClientExtensions;
+using System;
+using NUnit.Framework.Internal;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
     [Scope(Feature = "MetricsReport")]
-    public partial class MetricsReportSteps
+    public partial class MetricsReportSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private readonly string _storageDirectory;
@@ -24,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 
-        public MetricsReportSteps(TestContext testContext)
+        public MetricsReportSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
@@ -42,25 +44,95 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await _testContext.SetActiveCollectionCalendarPeriod(new CollectionPeriod() { Period = CollectionPeriod, Year = CollectionPeriodYear });
 
+            var paymentOrchestratorTask = IncentivePaymentOrchestratorTask();
+            var emailReceivedTask = EmailReceivedAndAuthorisedTask();
+
+            await Task.WhenAll(paymentOrchestratorTask, emailReceivedTask);
+        }
+
+        private static bool IncentivePaymentOrchestratorCompleted = false;
+
+        private async Task IncentivePaymentOrchestratorTask()
+        {
             await _testContext.TestFunction.Start(
-               new OrchestrationStarterInfo(
-                   "IncentivePaymentOrchestrator_HttpStart",
-                   nameof(IncentivePaymentOrchestrator),
-                   new Dictionary<string, object>
-                   {
-                       ["req"] = new DummyHttpRequest
-                       {
-                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
-                       }
-                   },
-                   expectedCustomStatus: "WaitingForPaymentApproval"
-                   ));
+                new OrchestrationStarterInfo(
+                    "IncentivePaymentOrchestrator_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
+                        }
+                    },
+                    expectedCustomStatus: "PaymentsApproved"
+                    ));
 
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
+            IncentivePaymentOrchestratorCompleted = true;
+
             var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
             var status = await _testContext.TestFunction.GetStatus(response.Id);
-            status.CustomStatus.ToObject<string>().Should().Be("WaitingForPaymentApproval");
+            status.CustomStatus.ToObject<string>().Should().Be("PaymentsApproved");
+        }
+
+        private async Task EmailReceivedAndAuthorisedTask()
+        {
+
+            while (IncentivePaymentOrchestratorCompleted == false)
+            {
+                var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
+                if (!directoryInfo.Exists)
+                {
+                    await Task.Delay(5000);
+                    continue;
+                }
+
+                var recentFiles = directoryInfo.GetFiles().Where(x => x.CreationTimeUtc >= DateTime.UtcNow.AddMinutes(-2));
+
+                if(recentFiles.Count() < 1)
+                {
+                    await Task.Delay(1000);
+                    continue;
+                }
+
+                foreach (var email in _testContext.PaymentProcessSettings.MetricsReportEmailList)
+                {
+                    foreach (var file in recentFiles)
+                    {
+                        var contents = File.ReadAllText(file.FullName, System.Text.Encoding.UTF8);
+                        if (contents.Contains("metricsReportDownloadLink"))
+                        {
+                            var temp = contents[(contents.IndexOf("approvePayments/") + "approvePayments/".Length)..];
+                            var approvalInstance = temp[1..temp.IndexOf("\"")];
+
+                            await _testContext.TestFunction.Start(
+                                new OrchestrationStarterInfo(
+                                    "PaymentApproval_HttpStart",
+                                    nameof(IncentivePaymentOrchestrator),
+                                    new Dictionary<string, object>
+                                    {
+                                        ["req"] = new DummyHttpRequest
+                                        {
+                                            Path = $"/api/orchestrators/approvePayments/{approvalInstance}"
+                                        },
+                                        ["instanceId"] = approvalInstance
+                                    }
+                                ));
+
+                                _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                            return;
+                        }
+                        else
+                        {
+                            await Task.Delay(1000);
+                        }
+                    }
+                }
+            }
+
+            return;
         }
 
         [Then(@"the Metrics report is generated and sent")]
@@ -72,7 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 blobItem.Name.Should().Be($"Metrics/LOCAL_ACCEPTANCE_TESTS Metrics R06_2021.xlsx");
                 blobItem.Properties.ContentType.Should().Be("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            }
+            }            
         }
 
         [Then("the Metrics report emails are sent")]
@@ -105,6 +177,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     Assert.Fail($"No NServiceBus message found with the metrics report sent to {email}");
                 }
             }
+        }
+
+        [Then(@"a Slack message is posted to notify the Metrics report generation")]
+        public void ThenASlackMessageIsPostedToNotityTheMetricsReportGeneration()
+        {
+            var command = TestContext.CommandsPublished.Single(c =>
+                    c.IsPublished &&
+                    c.Command is Commands.Types.PaymentProcess.SlackNotificationCommand).Command as Commands.Types.PaymentProcess.SlackNotificationCommand;
+
+            command.SlackMessage.Should().NotBeNull();
+            command.SlackMessage.Content.Should().Contain(nameof(MetricsReportGenerated));
         }
     }
 }

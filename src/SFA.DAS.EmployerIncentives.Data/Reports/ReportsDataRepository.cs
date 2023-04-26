@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports
             }
 
             using var dbConnection = _connectionProvider.New();
+
             var results = await dbConnection.QueryMultipleAsync("reports.MetricsReport", commandType: System.Data.CommandType.StoredProcedure);
 
             var report = new MetricsReport
@@ -31,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports
                 PaymentsMade = results.Read<PaymentsMade>().ToList(),
                 Earnings = results.Read<Earning>().ToList(),
                 Clawbacks = results.Read<Clawbacks>().SingleOrDefault(),
-                PeriodValidations = results.Read<Validation>().ToList(),                
+                PeriodValidations = results.Read<Validation>().ToList(),
                 ValidationSummary = new PeriodValidationSummary
                 {
                     ValidRecords = results.Read<PeriodValidationSummary.ValidationSummaryRecord>().SingleOrDefault(),

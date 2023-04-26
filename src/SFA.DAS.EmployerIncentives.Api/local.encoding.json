@@ -1,0 +1,64 @@
+﻿{
+  "Encodings": [
+    {
+      "EncodingType": "AccountId",
+      "Salt": "SFA: digital apprenticeship service",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "PublicAccountId",
+      "Salt": "451&7v5C5t0o2661fbxU^*8u",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "PublicAccountLegalEntityId",
+      "Salt": "XhK%WgqXkLoT",
+      "MinHashLength": 6,
+      "Alphabet": "ABCDEFGHJKMNPRSTUVWXYZ23456789"
+    },
+    {
+      "EncodingType": "CohortReference",
+      "Salt": "SFA: digital apprenticeship service",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "ApprenticeshipId",
+      "Salt": "SFA: digital apprenticeship service",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "RedundancyServiceApprenticeReference",
+      "Salt": "das-redundancy-service-apprentice",
+      "MinHashLength": 6,
+      "Alphabet": "ABCDEFGHJKMNPRSTUVWXYZ23456789"
+    },
+    {
+      "EncodingType": "RedundancyServiceEmployerReference",
+      "Salt": "das-redundancy-service-employer",
+      "MinHashLength": 6,
+      "Alphabet": "ABCDEFGHJKMNPRSTUVWXYZ23456789"
+    },
+    {
+      "EncodingType": "PledgeId",
+      "Salt": "SFA.DAS.LevyTransferMatching",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "TransferRequestId",
+      "Salt": "SFA: digital apprenticeship service",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    },
+    {
+      "EncodingType": "PledgeApplicationId",
+      "Salt": "SFA.DAS.LevyTransferMatching",
+      "MinHashLength": 6,
+      "Alphabet": "46789BCDFGHJKLMNPRSTVWXY"
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
-using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess
@@ -11,11 +10,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
         public string EmailAddress { get; private set; }
 
-        public SendMetricsReportEmailCommand(Domain.ValueObjects.CollectionPeriod collectionPeriod,
-                                             string emailAddress)
+        public string ApprovalLink { get; private set; }
+
+        public SendMetricsReportEmailCommand(
+            Domain.ValueObjects.CollectionPeriod collectionPeriod,
+            string emailAddress,
+            string approvalLink)
         {
             CollectionPeriod = collectionPeriod;
             EmailAddress = emailAddress;
+            ApprovalLink = approvalLink;
         }
 
         [Newtonsoft.Json.JsonIgnore]

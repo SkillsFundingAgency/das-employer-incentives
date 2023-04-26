@@ -17,9 +17,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             string instanceId,
             ILogger log)
         {
+            
             log.LogInformation($"Approving payments for orchestrator instance {instanceId}");
 
-            await starter.RaiseEventAsync(instanceId, "PaymentsApproved", true);
+            if (instanceId.Contains("_"))
+            {
+                var instanceParts = instanceId.Split("_");
+
+                await starter.RaiseEventAsync(instanceParts[1], $"PaymentsApproved_{instanceParts[1]}", true);
+            }
+            else
+            {
+                await starter.RaiseEventAsync(instanceId, "PaymentsApproved", true);
+            }
 
             log.LogInformation($"Approved payments for orchestrator instance {instanceId}");
 
