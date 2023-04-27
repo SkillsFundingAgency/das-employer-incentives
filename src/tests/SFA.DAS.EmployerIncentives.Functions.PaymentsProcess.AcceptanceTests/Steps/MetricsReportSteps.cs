@@ -13,6 +13,7 @@ using static SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTest
 using System;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -27,34 +28,38 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 
+        private static bool IncentivePaymentOrchestratorCompleted = false;
+        private string _paymentRunStatus;
+
         public MetricsReportSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
+
+            _testContext.PaymentsApi.MockServer
+                   .Given(
+                       Request
+                           .Create()
+                           .WithPath($"/payments/requests")
+                           .WithHeader("Content-Type", "application/payments-data")
+                           .WithParam("api-version", "2020-10-01")
+                           .UsingPost()
+                   )
+                   .RespondWith(Response.Create()
+                       .WithStatusCode(HttpStatusCode.Accepted)
+                       .WithHeader("Content-Type", "application/json"));
+
         }
 
         [Given(@"valid payments exist")]
         public async Task GivenValidPaymentsExist()
         {
-            _testContext.PaymentsApi.MockServer
-                .Given(
-                    Request
-                        .Create()
-                        .WithPath($"/payments/requests")
-                        .WithHeader("Content-Type", "application/payments-data")
-                        .WithParam("api-version", "2020-10-01")
-                        .UsingPost()
-                )
-                .RespondWith(Response.Create()
-                    .WithStatusCode(HttpStatusCode.Accepted)
-                    .WithHeader("Content-Type", "application/json"));
-
             _validatePaymentData = new ValidatePaymentsSteps.ValidatePaymentData(_testContext);
             await _validatePaymentData.Create();
         }
 
-        [When(@"the payment process is run")]
-        public async Task WhenThePaymentProcessIsRun()
+        [When(@"the payment process is run and approved")]
+        public async Task WhenThePaymentProcessIsRunAndApproved()
         {
             await _testContext.SetActiveCollectionCalendarPeriod(new CollectionPeriod() { Period = CollectionPeriod, Year = CollectionPeriodYear });
 
@@ -64,9 +69,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await Task.WhenAll(paymentOrchestratorTask, emailReceivedTask);
         }
 
-        private static bool IncentivePaymentOrchestratorCompleted = false;
+        [When(@"the payment process is run but approvals are not received in time")]
+        public async Task WhenThePaymentProcessIsRunAndNotApprovedInTime()
+        {
+            await _testContext.SetActiveCollectionCalendarPeriod(new CollectionPeriod() { Period = CollectionPeriod, Year = CollectionPeriodYear });
 
-        private async Task IncentivePaymentOrchestratorTask()
+            await IncentivePaymentOrchestratorTask("PaymentsRejected");
+        }
+        private async Task IncentivePaymentOrchestratorTask(string expectedStatus = "PaymentsApproved")
         {
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
@@ -79,16 +89,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
                         }
                     },
-                    expectedCustomStatus: "PaymentsApproved"
+                    expectedCustomStatus: expectedStatus
                     ));
 
             IncentivePaymentOrchestratorCompleted = true;
+            _paymentRunStatus = expectedStatus;
         }
 
         private async Task EmailReceivedAndAuthorisedTask()
         {
             while (IncentivePaymentOrchestratorCompleted == false)
             {
+                var taskList = new List<Task>();
+
                 var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
                 if (!directoryInfo.Exists)
                 {
@@ -98,7 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                 var recentFiles = directoryInfo.GetFiles().Where(x => x.CreationTimeUtc >= DateTime.UtcNow.AddMinutes(-2));
 
-                if(recentFiles.Count() < _testContext.PaymentProcessSettings.MetricsReportEmailList.Count())
+                if (recentFiles.Count() < _testContext.PaymentProcessSettings.MetricsReportEmailList.Count())
                 {
                     await Task.Delay(1000);
                     continue;
@@ -114,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             var temp = contents[(contents.IndexOf("approvePayments/") + "approvePayments/".Length)..];
                             var approvalInstance = temp[1..temp.IndexOf("\"")];
 
-                            await _testContext.TestFunction.Start(
+                            taskList.Add(_testContext.TestFunction.Start(
                                 new OrchestrationStarterInfo(
                                     "PaymentApproval_HttpStart",
                                     nameof(IncentivePaymentOrchestrator),
@@ -125,18 +138,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                             Path = $"/api/orchestrators/approvePayments/{approvalInstance}"
                                         },
                                         ["instanceId"] = approvalInstance
-                                    }
-                                ));
-
-                                _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-                            return;
-                        }
-                        else
-                        {
-                            await Task.Delay(1000);
-                        }
-                    }
+                                    })));
+                        }                      
+                    }                  
                 }
+
+                await Task.WhenAll(taskList);
             }
 
             return;
@@ -151,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 blobItem.Name.Should().Be($"Metrics/LOCAL_ACCEPTANCE_TESTS Metrics R06_2021.xlsx");
                 blobItem.Properties.ContentType.Should().Be("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            }            
+            }
         }
 
         [Then("the Metrics report emails are sent")]
@@ -189,12 +196,36 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a Slack message is posted to notify the Metrics report generation")]
         public void ThenASlackMessageIsPostedToNotityTheMetricsReportGeneration()
         {
-            var command = TestContext.CommandsPublished.Single(c =>
+            var publishedCommand = TestContext.CommandsPublished.Single(c =>
                     c.IsPublished &&
                     c.Command is Commands.Types.PaymentProcess.SlackNotificationCommand).Command as Commands.Types.PaymentProcess.SlackNotificationCommand;
 
-            command.SlackMessage.Should().NotBeNull();
-            command.SlackMessage.Content.Should().Contain(nameof(MetricsReportGenerated));
+            publishedCommand.SlackMessage.Should().NotBeNull();
+            publishedCommand.SlackMessage.Content.Should().Contain(nameof(MetricsReportGenerated));
         }
+
+        [Then(@"the payment run is rejected")]
+        public void ThenThePaymentRunIsrejected()
+        {
+            _paymentRunStatus.Should().Be("PaymentsRejected");
+        }
+
+        [Then(@"the payments can be sent to Business Central")]
+        public Task ThenThePaymentCanBeSent()
+        {
+            var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count(l => l.RequestMessage.AbsolutePath == "/payments/requests");
+            paymentRequestCount.Should().Be(2);
+
+            return Task.CompletedTask;
+        }
+
+        [Then(@"the payments are not sent to Business Central")]
+        public Task ThenThePaymentsAreNotSent()
+        {
+            var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count(l => l.RequestMessage.AbsolutePath == "/payments/requests");
+            paymentRequestCount.Should().Be(0);
+
+            return Task.CompletedTask;
+        }        
     }
 }

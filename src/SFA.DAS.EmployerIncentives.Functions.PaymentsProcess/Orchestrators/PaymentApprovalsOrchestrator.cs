@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             foreach (var approvalTask in taskList)
             {
-                approvalResults.Add(new PaymentApprovalResult() { EmailAddress = approvalTask.Result.EmailAddress, PaymentApprovalStatus = approvalTask.Result.PaymentApprovalStatus });
+                approvalResults.Add(approvalTask.Result);
             }
             
             return new PaymentApprovalsOutput(approvalResults);

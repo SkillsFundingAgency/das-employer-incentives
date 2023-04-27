@@ -28,36 +28,37 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         public async Task<PaymentApprovalResult> RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var paymentApprovalInput = context.GetInput<PaymentApprovalInput>();
+     
+            var collectionPeriod = new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year);
 
-            paymentApprovalInput.PaymentApprovalOrchestrationId = context.InstanceId;
-
-            var approvalLink = GenerateApprovalUrl(paymentApprovalInput);
-
-            await context.CallActivityAsync(
+             await context.CallActivityAsync(
                 nameof(SendMetricsReportEmail),
                 new SendMetricsReportEmailInput
                 {
                     CollectionPeriod = paymentApprovalInput.CollectionPeriod,
                     EmailAddress = paymentApprovalInput.EmailAddress,
-                    ApprovalLink = approvalLink
+                    ApprovalLink = GenerateApprovalUrl(paymentApprovalInput, context)
                 });
-            paymentApprovalInput.EmailSent = true;
+
+            using var approvalTmeoutCts = new CancellationTokenSource();
 
             PaymentApprovalResult paymentApprovalResult;
-            Task<bool> approvalEvent = context.WaitForExternalEvent<bool>($"PaymentsApproved_{paymentApprovalInput.PaymentApprovalOrchestrationId}");
+            Task<bool> approvalEvent = context.WaitForExternalEvent<bool>($"PaymentsApproved_{context.InstanceId}");
+            Task approvalReminderTask = ApprovalReminderTask(
+                context, 
+                _paymentProcessSettings.Value, 
+                paymentApprovalInput, 
+                collectionPeriod,
+                approvalTmeoutCts.Token);
 
             while (true)
             {
-                using var timeoutCts = new CancellationTokenSource();
-
-                DateTime dueTime = context.CurrentUtcDateTime.AddSeconds(_paymentProcessSettings.Value.ApprovalReminderPeriodSecs);
-                Task durableTimeout = context.CreateTimer(dueTime, timeoutCts.Token);
-
-                if (approvalEvent == await Task.WhenAny(approvalEvent, durableTimeout))
+                if (approvalEvent == await Task.WhenAny(approvalEvent, approvalReminderTask))
                 {
-                    timeoutCts.Cancel();
+                    approvalTmeoutCts.Cancel();
+
                     await SendSlackNotification(new ApprovalNotificationReceived(
-                        new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year),
+                        collectionPeriod,
                         paymentApprovalInput.EmailAddress),
                         context);
 
@@ -66,25 +67,52 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 }
                 else
                 {
-                    if (paymentApprovalInput.RemindersSent >= _paymentProcessSettings.Value.ApprovalReminderRetryAttempts)
-                    {
-                        paymentApprovalResult = new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.NotApprovedInTime };
-                        break;
-                    }
-
-                    await SendSlackNotification(new ApprovalNotificationNotReceived(
-                        new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year),
+                    await SendSlackNotification(new ApprovalNotificationTimedOut(
+                        collectionPeriod,
                         paymentApprovalInput.EmailAddress),
                         context);
 
-                    paymentApprovalInput.RemindersSent++;
+                    return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.NotApprovedInTime }; 
                 }
             }
 
             return paymentApprovalResult;
         }
 
-        private string GenerateApprovalUrl(PaymentApprovalInput paymentApprovalInput)
+        private async Task ApprovalReminderTask(
+            IDurableOrchestrationContext context,
+            PaymentProcessSettings paymentProcessSettings,
+            PaymentApprovalInput paymentApprovalInput,
+            Domain.ValueObjects.CollectionPeriod collectionPeriod,
+            CancellationToken cancellationToken)
+        {
+            int remindersSent = 0;
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using var timeoutCts = new CancellationTokenSource();
+
+                DateTime dueTime = context.CurrentUtcDateTime.AddSeconds(paymentProcessSettings.ApprovalReminderPeriodSecs);
+                await context.CreateTimer(dueTime, timeoutCts.Token);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (remindersSent >= paymentProcessSettings.ApprovalReminderRetryAttempts)
+                {
+                    break;
+                }
+
+                await SendSlackNotification(new ApprovalNotificationNotReceived(
+                    collectionPeriod,
+                    paymentApprovalInput.EmailAddress),
+                    context);
+
+                remindersSent++;
+            }
+        }
+
+        private string GenerateApprovalUrl(
+            PaymentApprovalInput paymentApprovalInput,
+            IDurableOrchestrationContext context)
         {
             var host = _paymentProcessSettings.Value.AuthorisationBaseUrl;
             if (!host.EndsWith("/"))
@@ -92,16 +120,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 host = $"{host}/";
             }
 
-            return  $"{host}orchestrators/approvePayments/{paymentApprovalInput.PaymentOrchestrationId}_{paymentApprovalInput.PaymentApprovalOrchestrationId}";
+            return  $"{host}orchestrators/approvePayments/{paymentApprovalInput.PaymentOrchestrationId}_{context.InstanceId}";
         }
 
         private Task SendSlackNotification<T>(
             T notification,
             IDurableOrchestrationContext context) where T : ISlackNotification
         {
-            return context.CallActivityAsync(
-                         nameof(SendSlackNotification),
-                         new SendSlackNotificationInput(notification.Message));
+            try
+            {
+                return context.CallActivityAsync(
+                             nameof(SendSlackNotification),
+                             new SendSlackNotificationInput(notification.Message));
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Unable to send Slack notification", ex);
+
+                return Task.CompletedTask;
+            }
         }
     }
 }

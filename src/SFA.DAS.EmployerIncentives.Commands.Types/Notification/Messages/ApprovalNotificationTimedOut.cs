@@ -4,12 +4,12 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Notification.Messages
 {
-    public class ApprovalNotificationNotReceived : ISlackNotification
+    public class ApprovalNotificationTimedOut : ISlackNotification
     {
         private readonly CollectionPeriod _collectionPeriod;
         private readonly string _approverEmailAddress;
 
-        public ApprovalNotificationNotReceived(
+        public ApprovalNotificationTimedOut(
             CollectionPeriod collectionPeriod,
             string approverEmailAddress)
         {
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Notification.Messages
         public SlackMessage Message => new SlackMessageBuilder()
                 .AddSection(
                     new SlackSectionBuilder(block_id: nameof(MetricsReportGenerated))
-                        .AddText(new SlackTextBuilder(SlackTextBuilder.Type.Plain, $"Payment approval not yet received from approver {_approverEmailAddress} for R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}.")
+                        .AddText(new SlackTextBuilder(SlackTextBuilder.Type.Plain, $"Payment approval not received in time from approver {_approverEmailAddress} for R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}.")
                      ))
                 .AddSection(
                     new SlackSectionBuilder()
