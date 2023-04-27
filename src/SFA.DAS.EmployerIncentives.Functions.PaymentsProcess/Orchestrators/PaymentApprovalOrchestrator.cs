@@ -42,7 +42,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             using var approvalTmeoutCts = new CancellationTokenSource();
 
-            PaymentApprovalResult paymentApprovalResult;
             Task<bool> approvalEvent = context.WaitForExternalEvent<bool>($"PaymentsApproved_{context.InstanceId}");
             Task approvalReminderTask = ApprovalReminderTask(
                 context, 
@@ -62,8 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                         paymentApprovalInput.EmailAddress),
                         context);
 
-                    paymentApprovalResult = new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.Approved };
-                    break;
+                    return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.Approved };
                 }
                 else
                 {
@@ -75,8 +73,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                     return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.NotApprovedInTime }; 
                 }
             }
-
-            return paymentApprovalResult;
         }
 
         private async Task ApprovalReminderTask(

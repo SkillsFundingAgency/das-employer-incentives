@@ -1,248 +1,246 @@
-//using AutoFixture;
-//using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-//using Microsoft.Extensions.Logging;
-//using Moq;
-//using NUnit.Framework;
-//using SFA.DAS.EmployerIncentives.Application.UnitTests;
-//using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
-//using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
-//using CollectionPeriod = SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.CollectionPeriod;
-//using Microsoft.Extensions.Options;
-//using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using AutoFixture;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Application.UnitTests;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using CollectionPeriod = SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.CollectionPeriod;
 
-//namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
-//{
-//    public class WhenRunningPaymentsProcess
-//    {
-//        private Fixture _fixture;
-//        private CollectionPeriod _collectionPeriod;
-//        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
-//        private IncentivePaymentOrchestrator _orchestrator;
-//        private List<PayableLegalEntity> _payableLegalEntities;
-//        private List<ClawbackLegalEntity> _clawbackLegalEntities;
-//        private Mock<IOptions<PaymentProcessSettings>> _mockPaymentProcessSettings;
-//        private PaymentProcessSettings _paymentProcessSettings;
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
+{
+    public class WhenRunningPaymentsProcess
+    {
+        private Fixture _fixture;
+        private CollectionPeriod _collectionPeriod;
+        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
+        private IncentivePaymentOrchestrator _orchestrator;
+        private List<PayableLegalEntity> _payableLegalEntities;
+        private List<ClawbackLegalEntity> _clawbackLegalEntities;
+   
+        private Mock<ILogger<IncentivePaymentOrchestrator>> _mockLogger;
 
-//        private Mock<ILogger<IncentivePaymentOrchestrator>> _mockLogger;
+        [SetUp]
+        public void Setup()
+        {
+            _fixture = new Fixture();
+            _collectionPeriod = _fixture.Create<CollectionPeriod>();
+            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
 
-//        [SetUp]
-//        public void Setup()
-//        {
-//            _fixture = new Fixture();
-//            _collectionPeriod = _fixture.Create<CollectionPeriod>();
-//            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
+            _payableLegalEntities = _fixture.CreateMany<PayableLegalEntity>(3).ToList();
+            _payableLegalEntities[0].AccountId = 123;
+            _payableLegalEntities[0].AccountLegalEntityId = 456;
+            _clawbackLegalEntities = _fixture.CreateMany<ClawbackLegalEntity>(2).ToList();
+            _clawbackLegalEntities[1].AccountId = _payableLegalEntities[0].AccountId;
+            _clawbackLegalEntities[1].AccountLegalEntityId = _payableLegalEntities[0].AccountLegalEntityId;
 
-//            _payableLegalEntities = _fixture.CreateMany<PayableLegalEntity>(3).ToList();
-//            _payableLegalEntities[0].AccountId = 123;
-//            _payableLegalEntities[0].AccountLegalEntityId = 456;
-//            _clawbackLegalEntities = _fixture.CreateMany<ClawbackLegalEntity>(2).ToList();
-//            _clawbackLegalEntities[1].AccountId = _payableLegalEntities[0].AccountId;
-//            _clawbackLegalEntities[1].AccountLegalEntityId = _payableLegalEntities[0].AccountLegalEntityId;
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntity>>(nameof(GetPayableLegalEntities), _collectionPeriod)).ReturnsAsync(_payableLegalEntities);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod)).ReturnsAsync(_clawbackLegalEntities);
 
-//            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntity>>(nameof(GetPayableLegalEntities), _collectionPeriod)).ReturnsAsync(_payableLegalEntities);            
-//            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod)).ReturnsAsync(_clawbackLegalEntities);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null)).ReturnsAsync(_collectionPeriod);
 
-//            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<CollectionPeriod> (nameof(GetActiveCollectionPeriod), null)).ReturnsAsync(_collectionPeriod);
+            _mockLogger = new Mock<ILogger<IncentivePaymentOrchestrator>>();
 
-//            _mockLogger = new Mock<ILogger<IncentivePaymentOrchestrator>>();
+            _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object);
+        }
 
-//            _paymentProcessSettings = new PaymentProcessSettings
-//            {
-//                MetricsReportEmailList = new List<string>
-//                {
-//                    "metricsApprover1@email.com",
-//                    "metricsApprover2@email.com",
-//                    "metricsApprover3@email.com"
-//                }
-//            };
-//            _mockPaymentProcessSettings = new Mock<IOptions<PaymentProcessSettings>>();
-//            _mockPaymentProcessSettings.Setup(x => x.Value).Returns(_paymentProcessSettings);
+        [Test]
+        public async Task Then_the_active_period_is_set_to_in_progress()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object, _mockPaymentProcessSettings.Object);
-//        }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SetActivePeriodToInProgress", null), Times.Once);
+        }
 
-//        [Test]
-//        public async Task Then_the_active_period_is_set_to_in_progress()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_query_is_called_to_get_payable_legal_entities()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SetActivePeriodToInProgress", null), Times.Once);
-//        }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PayableLegalEntity>>("GetPayableLegalEntities", _collectionPeriod), Times.Once);
+        }
 
-//        [Test]
-//        public async Task Then_query_is_called_to_get_payable_legal_entities()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_sub_orchestrator_is_called_to_calculate_payments_for_each_legal_entity()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PayableLegalEntity>>("GetPayableLegalEntities", _collectionPeriod), Times.Once);
-//        }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                It.IsAny<AccountLegalEntityCollectionPeriod>()
+            ), Times.Exactly(_payableLegalEntities.Count + _clawbackLegalEntities.Count - 1)); // Duplicate account details in payments and clawbacks
 
-//        [Test]
-//        public async Task Then_sub_orchestrator_is_called_to_calculate_payments_for_each_legal_entity()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            foreach (var entity in _payableLegalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                        "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                        It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                            input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                            input.AccountId == entity.AccountId &&
+                            input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                            input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                "CalculatePaymentsForAccountLegalEntityOrchestrator",
-//                It.IsAny<AccountLegalEntityCollectionPeriod>()
-//            ), Times.Exactly(_payableLegalEntities.Count + _clawbackLegalEntities.Count - 1)); // Duplicate account details in payments and clawbacks
+                    ), Times.Once);
+            }
 
-//            foreach (var entity in _payableLegalEntities)
-//            {
-//                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                        "CalculatePaymentsForAccountLegalEntityOrchestrator",
-//                        It.Is<AccountLegalEntityCollectionPeriod>(input =>
-//                            input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-//                            input.AccountId == entity.AccountId &&
-//                            input.CollectionPeriod.Period == _collectionPeriod.Period &&
-//                            input.CollectionPeriod.Year == _collectionPeriod.Year)
+            foreach (var entity in _clawbackLegalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                        input.AccountId == entity.AccountId &&
+                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                        input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-//                    ), Times.Once);
-//            }
+                ), Times.Once);
+            }
+        }
 
-//            foreach (var entity in _clawbackLegalEntities)
-//            {
-//                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                    "CalculatePaymentsForAccountLegalEntityOrchestrator",
-//                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
-//                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-//                        input.AccountId == entity.AccountId &&
-//                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
-//                        input.CollectionPeriod.Year == _collectionPeriod.Year)
+        [Test]
+        public async Task Then_process_pauses_after_generating_payments()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//                ), Times.Once);
-//            }
-//        }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                It.IsAny<AccountLegalEntityCollectionPeriod>()
+            ), Times.Exactly(_payableLegalEntities.Count + _clawbackLegalEntities.Count - 1)); // Duplicated account id across lists
 
-//        [Test]
-//        public async Task Then_process_calls_the_activity_function_to_send_the_metrics_report_emails()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            _mockOrchestrationContext.Verify(x => x.WaitForExternalEvent<bool>("PaymentsApproved"), Times.Once);
+        }
 
-//            // assert
-//            foreach(var email in _paymentProcessSettings.MetricsReportEmailList)
-//            {
-//                _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendMetricsReportEmail", It.Is<SendMetricsReportEmailInput>(x => x.EmailAddress == email)));
-//            }
-//        }
+        [Test]
+        public async Task Then_payments_are_not_sent_if_not_approved()
+        {
+            // arrange
+            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(false);
 
-//        [Test]
-//        public async Task Then_process_pauses_after_generating_payments()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                "CalculatePaymentsForAccountLegalEntityOrchestrator",
-//                It.IsAny<AccountLegalEntityCollectionPeriod>()
-//            ), Times.Exactly(_payableLegalEntities.Count + _clawbackLegalEntities.Count - 1)); // Duplicated account id across lists
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Never);
+        }
 
-//            _mockOrchestrationContext.Verify(x => x.WaitForExternalEvent<bool>("PaymentsApproved"), Times.Once);
-//        }
+        [Test]
+        public async Task Then_payments_and_clawbacks_are_sent_when_they_are_approved()
+        {
+            // arrange
+            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
 
-//        [Test]
-//        public async Task Then_payments_are_not_sent_if_not_approved()
-//        {
-//            // arrange
-//            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(false);
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            // assert
+            var expectedCallCount = _payableLegalEntities.Count + _clawbackLegalEntities.Count - 1; // one account legal entity has both payments and clawbacks
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendPaymentsForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(expectedCallCount));
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Never);
-//        }
+            foreach (var entity in _payableLegalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "SendPaymentsForAccountLegalEntityOrchestrator",
+                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                        input.AccountId == entity.AccountId &&
+                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                        input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-//        [Test]
-//        public async Task Then_payments_and_clawbacks_are_sent_when_they_are_approved()
-//        {
-//            // arrange
-//            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
+                ), Times.Once);
+            }
 
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            foreach (var entity in _clawbackLegalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "SendPaymentsForAccountLegalEntityOrchestrator",
+                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                        input.AccountId == entity.AccountId &&
+                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                        input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-//            // assert
-//            var expectedCallCount = _payableLegalEntities.Count + _clawbackLegalEntities.Count - 1; // one account legal entity has both payments and clawbacks
-//            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendPaymentsForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(expectedCallCount));
+                ), Times.Once);
+            }
+        }
 
-//            foreach (var entity in _payableLegalEntities)
-//            {
-//                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                    "SendPaymentsForAccountLegalEntityOrchestrator",
-//                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
-//                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-//                        input.AccountId == entity.AccountId &&
-//                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
-//                        input.CollectionPeriod.Year == _collectionPeriod.Year)
+        [Test]
+        public async Task Then_call_is_made_to_get_unsent_clawback_legal_entities()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//                ), Times.Once);
-//            }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod), Times.Once);
+        }
 
-//            foreach (var entity in _clawbackLegalEntities)
-//            {
-//                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-//                    "SendPaymentsForAccountLegalEntityOrchestrator",
-//                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
-//                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-//                        input.AccountId == entity.AccountId &&
-//                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
-//                        input.CollectionPeriod.Year == _collectionPeriod.Year)
+        [Test]
+        public async Task Then_call_is_made_to_get_the_active_collection_period()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//                ), Times.Once);
-//            }
-//        }
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null), Times.Once);
+        }
 
-//        [Test]
-//        public async Task Then_call_is_made_to_get_unsent_clawback_legal_entities()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_unsent_clawback_legal_entities_are_logged()
+        {
+            // arrange
+            var clawbackLegalEntities = _fixture.Create<List<ClawbackLegalEntity>>();
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod), Times.Once);
-//        }
+            _mockOrchestrationContext
+                .Setup(m => m.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod))
+                .ReturnsAsync(clawbackLegalEntities);
 
-//        [Test]
-//        public async Task Then_call_is_made_to_get_the_active_collection_period()
-//        {
-//            // act
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            // act 
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // assert
-//            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null), Times.Once);
-//        }
+            // assert
+            foreach (var clawbackLegalEntity in clawbackLegalEntities)
+            {
+                _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Unsent clawback for AccountId : {clawbackLegalEntity.AccountId}, AccountLegalEntityId : {clawbackLegalEntity.AccountLegalEntityId}, Collection Year : {_collectionPeriod.Year}, Period : {_collectionPeriod.Period}");
+            }
+        }
 
-//        [Test]
-//        public async Task Then_unsent_clawback_legal_entities_are_logged()
-//        {
-//            // arrange
-//            var clawbackLegalEntities = _fixture.Create<List<ClawbackLegalEntity>>();
+        [Test]
+        public async Task Then_an_activity_is_called_to_create_the_metrics_report()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            _mockOrchestrationContext
-//                .Setup(m => m.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), _collectionPeriod))
-//                .ReturnsAsync(clawbackLegalEntities);
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync(
+                "SendMetricsReport",
+                It.Is<SendMetricsReportInput>( i => i.CollectionPeriod == _collectionPeriod)
+            ), Times.Exactly(1));
+        }
 
-//            // act 
-//            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_a_sub_orchestrator_is_called_to_request_payment_approval()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-//            // assert
-//            foreach (var clawbackLegalEntity in clawbackLegalEntities)
-//            {
-//                _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Unsent clawback for AccountId : {clawbackLegalEntity.AccountId}, AccountLegalEntityId : {clawbackLegalEntity.AccountLegalEntityId}, Collection Year : {_collectionPeriod.Year}, Period : {_collectionPeriod.Period}");
-//            }            
-//        }
-//    }
-//}
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<PaymentApprovalsOutput>(
+                "PaymentApprovalsOrchestrator",
+                It.Is<PaymentApprovalsInput>(i => i.CollectionPeriod == _collectionPeriod 
+                && i.PaymentOrchestrationId == _mockOrchestrationContext.Object.InstanceId)
+            ), Times.Exactly(1));
+        }
+    }
+}

@@ -32,12 +32,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private string _emailAddress;
         private double _validRecordsAmount;
         private double _invalidRecordsAmount;
+        private string _approvalLink;
 
         [SetUp]
         public void Arrange()
         {
             _validRecordsAmount = 4.54 * 1000000;
             _invalidRecordsAmount = 72.67 * 1000000;
+            _approvalLink = $"http://approvals";
 
             _metricsReport = new MetricsReport
             {
@@ -88,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_report_is_retrieved_from_the_database()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
 
             // Act
             await _sut.Handle(command);
@@ -101,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_converted_report_is_persisted_to_the_reports_repository_with_the_corrrect_fileInfo()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod,  _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod,  _emailAddress, _approvalLink);
             var expectedFileInfo = new ReportsFileInfo($"UnitTest Metrics R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{_collectionPeriod.AcademicYear}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics");
 
             // Act
@@ -115,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_correct_templateId_is_used_when_publishing_the_command()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
             var expectedTemplateId = _templates.MetricsReport.TemplateId;
 
             //Act
@@ -129,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_correct_email_address_is_used_when_publishing_the_command()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
             var expectedEmail = _emailAddress;
 
             //Act
@@ -143,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_correct_personalisation_tokens_are_used_when_publishing_the_command()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
 
             //Act
             await _sut.Handle(command);
@@ -154,7 +156,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 m.Tokens.ContainsKey("academicYear") && m.Tokens["academicYear"] == "2324" &&
                 m.Tokens.ContainsKey("amountToBePaid") && m.Tokens["amountToBePaid"] == "4.54m" && 
                 m.Tokens.ContainsKey("amountFailingValidation") && m.Tokens["amountFailingValidation"] == "72.67m" &&
-                m.Tokens.Count == 4), It.IsAny<CancellationToken>()), Times.Once);
+                m.Tokens.ContainsKey("metricsReportApprovalLink") && m.Tokens["metricsReportApprovalLink"] == _approvalLink &&
+                m.Tokens.Count == 5), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestCase(8500, 9500, "8.5k", "9.5k")]
@@ -178,7 +181,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Execute<MetricsReport>())
                 .ReturnsAsync(_metricsReport);
 
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
 
             //Act
             await _sut.Handle(command);
@@ -189,14 +192,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 m.Tokens.ContainsKey("academicYear") && m.Tokens["academicYear"] == "2324" &&
                 m.Tokens.ContainsKey("amountToBePaid") && m.Tokens["amountToBePaid"] == expectedValidRecordsText &&
                 m.Tokens.ContainsKey("amountFailingValidation") && m.Tokens["amountFailingValidation"] == expectedInvalidRecordsText &&
-                m.Tokens.Count == 4), It.IsAny<CancellationToken>()), Times.Once);
+                m.Tokens.ContainsKey("metricsReportApprovalLink") && m.Tokens["metricsReportApprovalLink"] == _approvalLink &&
+                m.Tokens.Count == 5), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
         public async Task Then_the_correct_attachments_are_used_when_publishing_the_command()
         {
             //Arrange
-            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress);
+            var command = new SendMetricsReportEmailCommand(_collectionPeriod, _emailAddress, _approvalLink);
 
             //Act
             await _sut.Handle(command);
