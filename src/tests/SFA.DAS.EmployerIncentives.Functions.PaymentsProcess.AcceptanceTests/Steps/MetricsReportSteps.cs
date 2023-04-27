@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using static SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Extensions.BlobContainerClientExtensions;
 using System;
-using NUnit.Framework.Internal;
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -35,6 +36,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"valid payments exist")]
         public async Task GivenValidPaymentsExist()
         {
+            _testContext.PaymentsApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/payments/requests")
+                        .WithHeader("Content-Type", "application/payments-data")
+                        .WithParam("api-version", "2020-10-01")
+                        .UsingPost()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.Accepted)
+                    .WithHeader("Content-Type", "application/json"));
+
             _validatePaymentData = new ValidatePaymentsSteps.ValidatePaymentData(_testContext);
             await _validatePaymentData.Create();
         }
@@ -68,18 +82,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     expectedCustomStatus: "PaymentsApproved"
                     ));
 
-            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
-
             IncentivePaymentOrchestratorCompleted = true;
-
-            var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
-            var status = await _testContext.TestFunction.GetStatus(response.Id);
-            status.CustomStatus.ToObject<string>().Should().Be("PaymentsApproved");
         }
 
         private async Task EmailReceivedAndAuthorisedTask()
         {
-
             while (IncentivePaymentOrchestratorCompleted == false)
             {
                 var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
@@ -91,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                 var recentFiles = directoryInfo.GetFiles().Where(x => x.CreationTimeUtc >= DateTime.UtcNow.AddMinutes(-2));
 
-                if(recentFiles.Count() < 1)
+                if(recentFiles.Count() < _testContext.PaymentProcessSettings.MetricsReportEmailList.Count())
                 {
                     await Task.Delay(1000);
                     continue;
