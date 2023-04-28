@@ -70,11 +70,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddReportServices();
 
             builder.Services.AddNServiceBus(config);
-
-            
-            //builder.Services.AddScoped<IDurableOrchestrationClient>(s => {
-            //    return s.GetService<DurableTaskExtension>().GetClient(new OrchestrationClientAttribute());
-            //});
         }
     }
 }
