@@ -311,8 +311,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithLogging(s.GetService<ILoggerFactory>());
 
                 var client = clientBuilder.Build();
-                
-                return new SlackNotificationService(client, settings.WebHookUrl);
+
+                return new SlackNotificationService(client, settings.WebHookUrl);                
             });
 
             return serviceCollection;

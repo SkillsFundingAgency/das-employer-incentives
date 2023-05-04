@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendSlack
         }
 
         public Task Handle(SlackNotificationCommand command, CancellationToken cancellationToken = default)
-        {            
+        {   
             return _slackNotificationService.Send(command.SlackMessage);
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var taskList = new List<Task<PaymentApprovalResult>>();
             foreach (var email in _paymentProcessSettings.Value.MetricsReportEmailList.Where(t => !string.IsNullOrEmpty(t)))
             {
-                Task<PaymentApprovalResult> task = context.CallSubOrchestratorAsync<PaymentApprovalResult>(nameof(PaymentApprovalOrchestrator), new PaymentApprovalInput(paymentApprovalsInput.CollectionPeriod, email, paymentApprovalsInput.PaymentOrchestrationId));
+                Task<PaymentApprovalResult> task = context.CallSubOrchestratorAsync<PaymentApprovalResult>(
+                        nameof(PaymentApprovalOrchestrator), 
+                        new PaymentApprovalInput(
+                                paymentApprovalsInput.CollectionPeriod, 
+                                email, 
+                                paymentApprovalsInput.PaymentOrchestrationId,
+                                Guid.NewGuid().ToString().Replace("-", "")));
                 taskList.Add(task);
             }
 

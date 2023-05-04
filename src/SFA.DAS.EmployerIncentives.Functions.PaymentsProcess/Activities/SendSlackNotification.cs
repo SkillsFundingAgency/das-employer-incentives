@@ -1,18 +1,17 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.PaymentProcess;
+using SFA.DAS.EmployerIncentives.Commands.Services.SlackApi;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class SendSlackNotification
     {
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ISlackNotificationService _slackNotificationService;
 
-        public SendSlackNotification(ICommandDispatcher commandDispatcher)
+        public SendSlackNotification(ISlackNotificationService slackNotificationService)
         {
-            _commandDispatcher = commandDispatcher;
+            _slackNotificationService = slackNotificationService;
         }
 
         [FunctionName(nameof(SendSlackNotification))]
@@ -20,8 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             try
             {
-                var command = new SlackNotificationCommand(input.Message);
-                await _commandDispatcher.Send(command);
+                await _slackNotificationService.Send(input.Message);
             }
             catch { }
         }

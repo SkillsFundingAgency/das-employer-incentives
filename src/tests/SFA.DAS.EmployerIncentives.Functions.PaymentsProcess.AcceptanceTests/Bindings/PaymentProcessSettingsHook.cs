@@ -20,8 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
                     "metricsApprover2@email.com",
                     "metricsApprover3@email.com"
                 },
-                ApprovalReminderPeriodSecs = 10,
-                ApprovalReminderRetryAttempts = 2,
+                ApprovalReminderPeriodSecs = 600,
+                ApprovalReminderRetryAttempts = 5,
                 AuthorisationBaseUrl = new Uri(@"http://localhost:7071").AbsoluteUri
             };
         }

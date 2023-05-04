@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.SlackApi
         }
 
         public async Task Send(SlackMessage slackMessage, CancellationToken cancellationToken = default)
-        {   
+        {
             var response = await _client.PostAsync(
                _webhookUrl,
                new StringContent(slackMessage.Content)

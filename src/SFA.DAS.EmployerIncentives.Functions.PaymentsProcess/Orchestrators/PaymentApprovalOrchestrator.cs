@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Commands.Types.Notification.Messages;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Threading;
@@ -14,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
     public class PaymentApprovalOrchestrator
     {
         private readonly ILogger<PaymentApprovalOrchestrator> _logger;
-        private readonly IOptions<PaymentProcessSettings> _paymentProcessSettings;        
+        private readonly IOptions<PaymentProcessSettings> _paymentProcessSettings;
 
         public PaymentApprovalOrchestrator(
             ILogger<PaymentApprovalOrchestrator> logger,
@@ -28,21 +27,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         public async Task<PaymentApprovalResult> RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var paymentApprovalInput = context.GetInput<PaymentApprovalInput>();
-     
+            paymentApprovalInput.PaymentApprovalOrchestrationId = context.InstanceId;
+
             var collectionPeriod = new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year);
 
-             await context.CallActivityAsync(
-                nameof(SendMetricsReportEmail),
-                new SendMetricsReportEmailInput
-                {
-                    CollectionPeriod = paymentApprovalInput.CollectionPeriod,
-                    EmailAddress = paymentApprovalInput.EmailAddress,
-                    ApprovalLink = GenerateApprovalUrl(paymentApprovalInput, context)
-                });
-
+            await context.CallSubOrchestratorAsync(nameof(PaymentApprovalSendEmailOrchestrator), paymentApprovalInput);
+            
             using var approvalTmeoutCts = new CancellationTokenSource();
 
-            Task<bool> approvalEvent = context.WaitForExternalEvent<bool>($"PaymentsApproved_{context.InstanceId}");
+            Task<bool> approvalEvent = context.WaitForExternalEvent<bool>($"PaymentsApproved_{paymentApprovalInput.PaymentApprovalOrchestrationId}_{paymentApprovalInput.CorrelationId}");
             Task approvalReminderTask = ApprovalReminderTask(
                 context, 
                 _paymentProcessSettings.Value, 
@@ -56,16 +49,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 {
                     approvalTmeoutCts.Cancel();
 
-                    await SendSlackNotification(new ApprovalNotificationReceived(
+                    await SendSlackMessage(new ApprovalNotificationReceived(
                         collectionPeriod,
                         paymentApprovalInput.EmailAddress),
                         context);
 
                     return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.Approved };
-                }
-                else
+                }               
+                else // approvalReminderTask
                 {
-                    await SendSlackNotification(new ApprovalNotificationTimedOut(
+                    await SendSlackMessage(new ApprovalNotificationTimedOut(
                         collectionPeriod,
                         paymentApprovalInput.EmailAddress),
                         context);
@@ -76,11 +69,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         }
 
         private async Task ApprovalReminderTask(
-            IDurableOrchestrationContext context,
-            PaymentProcessSettings paymentProcessSettings,
-            PaymentApprovalInput paymentApprovalInput,
-            Domain.ValueObjects.CollectionPeriod collectionPeriod,
-            CancellationToken cancellationToken)
+           IDurableOrchestrationContext context,
+           PaymentProcessSettings paymentProcessSettings,
+           PaymentApprovalInput paymentApprovalInput,
+           Domain.ValueObjects.CollectionPeriod collectionPeriod,
+           CancellationToken cancellationToken)
         {
             int remindersSent = 0;
             while (!cancellationToken.IsCancellationRequested)
@@ -97,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                     break;
                 }
 
-                await SendSlackNotification(new ApprovalNotificationNotReceived(
+                await SendSlackMessage(new ApprovalNotificationNotReceived(
                     collectionPeriod,
                     paymentApprovalInput.EmailAddress),
                     context);
@@ -106,28 +99,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             }
         }
 
-        private string GenerateApprovalUrl(
-            PaymentApprovalInput paymentApprovalInput,
-            IDurableOrchestrationContext context)
-        {
-            var host = _paymentProcessSettings.Value.AuthorisationBaseUrl;
-            if (!host.EndsWith("/"))
-            {
-                host = $"{host}/";
-            }
-
-            return  $"{host}orchestrators/approvePayments/{paymentApprovalInput.PaymentOrchestrationId}_{context.InstanceId}";
-        }
-
-        private Task SendSlackNotification<T>(
+        private Task SendSlackMessage<T>(
             T notification,
             IDurableOrchestrationContext context) where T : ISlackNotification
         {
             try
             {
                 return context.CallActivityAsync(
-                             nameof(SendSlackNotification),
-                             new SendSlackNotificationInput(notification.Message));
+                                nameof(SendSlackNotification),
+                                new SendSlackNotificationInput(notification.Message));
             }
             catch(Exception ex)
             {

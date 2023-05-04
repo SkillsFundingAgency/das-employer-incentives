@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var templateId = _emailTemplates.MetricsReport.TemplateId;
 
-            var amountToBePaidInMillions = FormatMetricsValueForEmail(report.ValidationSummary.ValidRecords.PeriodAmount); 
+            var amountToBePaidInMillions = FormatMetricsValueForEmail(report.ValidationSummary.ValidRecords.PeriodAmount);
             var amountFailingValidationInMillions = FormatMetricsValueForEmail(report.ValidationSummary.InvalidRecords.PeriodAmount);
 
             var personalisationTokens = new Dictionary<string, string>
@@ -72,8 +72,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var reportBytes = await _reportsRepository.Get(reportFileInfo);
 
-            var attachments = new Dictionary<string, byte[]>{{ MetricsReportDownloadToken, reportBytes }};
-            
+            var attachments = new Dictionary<string, byte[]> { { MetricsReportDownloadToken, reportBytes } };
+
             var sendEmailCommand = new SendEmailWithAttachmentsCommand(templateId, command.EmailAddress, personalisationTokens, attachments);
 
             await _commandPublisher.Publish(sendEmailCommand);

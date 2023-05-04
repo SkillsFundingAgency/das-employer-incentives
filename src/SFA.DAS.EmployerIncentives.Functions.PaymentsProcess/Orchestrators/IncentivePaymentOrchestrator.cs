@@ -84,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             else // paymentsApprovedTask called
             {
                 if (!htppPaymentsApprovedTask.Result)
-                {
+                {   
                     context.SetCustomStatus("PaymentsRejected");
                     _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected via http endpoint", collectionPeriod);
                     return;

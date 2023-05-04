@@ -21,3 +21,4 @@ Scenario: When payment processing requires metrics approval which is not receive
 	And the Metrics report emails are sent
 	And the payment run is rejected
 	And the payments are not sent to Business Central
+	 
