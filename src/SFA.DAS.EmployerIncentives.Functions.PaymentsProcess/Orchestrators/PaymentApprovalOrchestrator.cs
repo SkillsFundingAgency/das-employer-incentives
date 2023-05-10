@@ -31,6 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             var collectionPeriod = new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year);
 
+            context.SetCustomStatus("Sending approval email");
+
             await context.CallSubOrchestratorAsync(nameof(PaymentApprovalSendEmailOrchestrator), paymentApprovalInput);
             
             using var approvalTmeoutCts = new CancellationTokenSource();
@@ -43,6 +45,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 collectionPeriod,
                 approvalTmeoutCts.Token);
 
+            context.SetCustomStatus("Waiting for approval");
+
+            bool isApproved = false;
             while (true)
             {
                 if (approvalEvent == await Task.WhenAny(approvalEvent, approvalReminderTask))
@@ -53,8 +58,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                         collectionPeriod,
                         paymentApprovalInput.EmailAddress),
                         context);
-
-                    return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.Approved };
+                    isApproved = true;
+                    break;
                 }               
                 else // approvalReminderTask
                 {
@@ -63,9 +68,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                         paymentApprovalInput.EmailAddress),
                         context);
 
-                    return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.NotApprovedInTime }; 
+                    break;
                 }
             }
+
+            if(isApproved)
+            {
+                context.SetCustomStatus("Approval received");
+                return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.Approved };
+            }
+
+            context.SetCustomStatus("Approval notification timed out");
+            return new PaymentApprovalResult() { EmailAddress = paymentApprovalInput.EmailAddress, PaymentApprovalStatus = PaymentApprovalStatus.NotApprovedInTime };
         }
 
         private async Task ApprovalReminderTask(
@@ -78,10 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             int remindersSent = 0;
             while (!cancellationToken.IsCancellationRequested)
             {
-                using var timeoutCts = new CancellationTokenSource();
-
                 DateTime dueTime = context.CurrentUtcDateTime.AddSeconds(paymentProcessSettings.ApprovalReminderPeriodSecs);
-                await context.CreateTimer(dueTime, timeoutCts.Token);
+                await context.CreateTimer(dueTime, cancellationToken);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -96,6 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                     context);
 
                 remindersSent++;
+
+                context.SetCustomStatus($"Sent approval reminder number  {remindersSent}");
             }
         }
 

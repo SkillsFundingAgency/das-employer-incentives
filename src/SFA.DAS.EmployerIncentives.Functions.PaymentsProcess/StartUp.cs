@@ -41,9 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     options.EnvironmentName = configuration["EnvironmentName"];
                     options.PreFixConfigurationKeys = false;
                 });
-            }
 
-            configBuilder.AddJsonFile("local.settings.json", optional: true);
+                configBuilder.AddJsonFile("local.settings.json", optional: true);
+            }
 
             var config = configBuilder.Build();
             builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config));

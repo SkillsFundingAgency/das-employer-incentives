@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
@@ -97,6 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private async Task EmailReceivedAndAuthorisedTask()
         {
+            int counter = 0;
             while (IncentivePaymentOrchestratorCompleted == false)
             {
                 var taskList = new List<Task>();
@@ -105,6 +107,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 if (!directoryInfo.Exists)
                 {
                     await Task.Delay(5000);
+                    counter++;
+                    if (counter > 20) Assert.Fail("Test timed out. Approval emails not sent in time");
                     continue;
                 }
 
@@ -113,6 +117,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 if (recentFiles.Count() < _testContext.PaymentProcessSettings.MetricsReportEmailList.Count())
                 {
                     await Task.Delay(1000);
+                    counter++;
+                    if (counter > 20) Assert.Fail("Test timed out. Approval emails not sent in time");
                     continue;
                 }
 
@@ -120,11 +126,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 {
                     foreach (var file in recentFiles)
                     {
-                        var contents = File.ReadAllText(file.FullName, System.Text.Encoding.UTF8);
-                        if (contents.Contains("metricsReportDownloadLink"))
+                        var sentEmail = JsonSerializer.Deserialize<Email>(File.ReadAllText(file.FullName, System.Text.Encoding.UTF8));
+
+                        if(sentEmail.RecipientsAddress == email && sentEmail.Tokens?.metricsReportApprovalLink != null)
                         {
-                            var temp = contents[(contents.IndexOf("approvePayments/") + "approvePayments/".Length)..];
-                            var approvalInstance = temp[1..temp.IndexOf("\"")];
+                            var approvalInstance = sentEmail.Tokens.metricsReportApprovalLink[(sentEmail.Tokens.metricsReportApprovalLink.IndexOf("approvePayments/") + "approvePayments/".Length)..];
 
                             taskList.Add(_testContext.TestFunction.Start(
                                 new OrchestrationStarterInfo(
@@ -138,7 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                         },
                                         ["instanceId"] = approvalInstance
                                     })));
-                        }                      
+                        }                  
                     }                  
                 }
 
@@ -147,6 +153,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             return;
         }
+
+        public class Email
+        {
+            public string TemplateId { get; set; }
+            public string RecipientsAddress { get; set; }
+            public Token Tokens { get; set; }
+        }
+
+        public class Token
+        {
+            public string metricsReportApprovalLink { get; set; }
+            public string periodName { get; set; }
+            public string academicYear { get; set; }
+            public string amountToBePaid { get; set; }
+            public string amountFailingValidation { get; set; }
+        }
+
 
         [Then(@"the Metrics report is generated and sent")]
         public async Task ThenTheMetricsReportIsGeneratedAndSent()

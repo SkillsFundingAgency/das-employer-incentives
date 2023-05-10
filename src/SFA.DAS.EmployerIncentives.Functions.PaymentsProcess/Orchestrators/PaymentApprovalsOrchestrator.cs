@@ -41,7 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 taskList.Add(task);
             }
 
+            context.SetCustomStatus("Waiting for payment approvals");
+
             await Task.WhenAll(taskList);
+
+            context.SetCustomStatus("Payment approvals responses received");
 
             var approvalResults = new List<PaymentApprovalResult>();
 

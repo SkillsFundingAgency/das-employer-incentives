@@ -30,6 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             
             var collectionPeriod = new Domain.ValueObjects.CollectionPeriod(paymentApprovalInput.CollectionPeriod.Period, paymentApprovalInput.CollectionPeriod.Year);
 
+            context.SetCustomStatus("Sending MetricsReport Email");
+
             await context.CallActivityAsync(
                nameof(SendMetricsReportEmail),
                new SendMetricsReportEmailInput
@@ -39,7 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                    ApprovalLink = GenerateApprovalUrl(paymentApprovalInput)
                });
 
-            if(paymentApprovalInput.IsResend)
+            context.SetCustomStatus("MetricsReport Email sent");
+
+            if (paymentApprovalInput.IsResend)
             {
 
                 await SendSlackMessage(new ApprovalEmailResent(
