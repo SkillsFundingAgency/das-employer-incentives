@@ -158,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     }
                 ));
 
-            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
     }
 }

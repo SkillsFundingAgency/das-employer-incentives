@@ -111,13 +111,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }
-
-        private static async Task PerformApprovalProcess(
-            IDurableOrchestrationContext context,
-            PaymentApprovalInput paymentApprovalInput)
-        {
-            await context.CallSubOrchestratorAsync(nameof(PaymentApprovalOrchestrator),
-                paymentApprovalInput);
-        }
     }
 }

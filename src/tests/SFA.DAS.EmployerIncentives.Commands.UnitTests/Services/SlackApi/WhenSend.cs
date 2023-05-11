@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.SlackApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.Notification;
@@ -23,8 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.SlackApiTests
         public void Arrange()
         {
             _fixture = new Fixture();
-            _webhookUrl = new Uri(@"http://localhost").AbsoluteUri;
             _httpClient = new TestHttpClient();
+            _webhookUrl = $"{_httpClient.BaseAddress.AbsoluteUri}webhook";
+            
             _sut = new SlackNotificationService(_httpClient, _webhookUrl);
         }
 
@@ -38,6 +40,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.SlackApiTests
 
             //Act
             await _sut.Send(message);
+
+            // Assert
+            _httpClient.VerifyPostAsAsync($"webhook", Times.Once());
         }
 
         [TestCase(HttpStatusCode.BadRequest)]
