@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.SlackApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.Notification;
