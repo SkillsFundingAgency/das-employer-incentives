@@ -98,10 +98,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                    configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
-
-
     }
-
-
-
 }

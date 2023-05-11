@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
+﻿namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
     public class OrchestratorStartResponse
     {

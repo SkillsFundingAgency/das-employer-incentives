@@ -11,7 +11,6 @@ Scenario: Employment checks requested on first ILR submission
 	And a 365 employment check is not requested
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -26,7 +25,6 @@ Scenario: Employment checks requested on Start date change of circumstance
 	And a 365 employment check is not requested
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -38,7 +36,6 @@ Scenario: 365 Employment check requested for Phase
 	Then a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase '<Phase>'
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -51,7 +48,6 @@ Scenario: 365 Employment check not re-requested for Phase after initial failure
 	Then a re-request 365 employment check is not requested
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -64,7 +60,6 @@ Scenario: 365 Employment check re-requested for Phase after initial failure
 	Then a re-request 365 employment check is requested for the phase '<Phase>'
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -78,7 +73,6 @@ Scenario: 365 Employment check not requested for Phase when learner stopped
 	And a re-request 365 employment check is not requested
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -93,7 +87,6 @@ Scenario: 365 Employment check not reinspired for Phase when stopped change of c
 	And the 365 employment check is not reinspired
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -109,7 +102,6 @@ Scenario: 365 and 365 re-request Employment checks not reinspired for Phase when
 	And the 365 second employment check is not reinspired
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -125,7 +117,6 @@ Scenario: 365 Employment check not reinspired for Phase when stopped change of c
 	And the 365 employment check is not reinspired
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -142,7 +133,6 @@ Scenario: 365 and 365 re-request Employment check not reinspired for Phase when 
 	And the 365 second employment check is not reinspired
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |
 
@@ -157,6 +147,5 @@ Scenario: 365 Employment check reinspired for Phase when resume change of circum
 	Then the 365 employment check is reinspired
 Examples:
 	| Phase  |
-	| Phase1 |
 	| Phase2 |
 	| Phase3 |

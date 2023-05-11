@@ -1,12 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.Encoding;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -41,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);
+                Directory.CreateDirectory($"{TestDirectory.FullName}/.learningtransport");
             }
             TestData = new TestData();
             TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);

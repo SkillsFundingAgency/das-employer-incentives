@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
             hook.OnProcessed += (message) => { waitForResult.SetHasCompleted(); };
-            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); };
+            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
 
             try
             {

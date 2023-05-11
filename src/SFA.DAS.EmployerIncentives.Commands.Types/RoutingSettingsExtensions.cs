@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 using SFA.DAS.EmployerIncentives.Infrastructure;
+using SFA.DAS.EmployerIncentives.Commands.Types.PaymentProcess;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types
 {
@@ -31,6 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(RecalculateEarningsCommand), QueueNames.RecalculateEarningsCommand);
             routingSettings.RouteToEndpoint(typeof(ValidationOverrideCommand), QueueNames.ValidationOverride);
             routingSettings.RouteToEndpoint(typeof(PausePaymentsCommand), QueueNames.PausePaymentsCommand);
+            routingSettings.RouteToEndpoint(typeof(SlackNotificationCommand), QueueNames.SlackNotificationCommand);
         }
+
     }
 }

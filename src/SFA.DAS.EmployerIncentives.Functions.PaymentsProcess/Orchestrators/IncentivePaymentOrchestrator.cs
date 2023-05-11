@@ -66,16 +66,32 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             context.SetCustomStatus("SendingMetricsReport");
             await context.CallActivityAsync(nameof(SendMetricsReport), new SendMetricsReportInput() { CollectionPeriod = collectionPeriod });
-
+                        
+            var emailApprovalsTask = context.CallSubOrchestratorAsync<PaymentApprovalsOutput>(nameof(PaymentApprovalsOrchestrator), new PaymentApprovalsInput(collectionPeriod, context.InstanceId));
             context.SetCustomStatus("WaitingForPaymentApproval");
 
-            var paymentsApproved = await context.WaitForExternalEvent<bool>("PaymentsApproved");
-            if (!paymentsApproved)
+            var htppPaymentsApprovedTask = context.WaitForExternalEvent<bool>("PaymentsApproved");
+
+            if (emailApprovalsTask == await Task.WhenAny(htppPaymentsApprovedTask, emailApprovalsTask))
             {
-                context.SetCustomStatus("PaymentsRejected");
-                _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected", collectionPeriod);
-                return;
+                if (emailApprovalsTask.Result.PaymentApprovalResults.Any(r => r.PaymentApprovalStatus != PaymentApprovalStatus.Approved))
+                {
+                    context.SetCustomStatus("PaymentsRejected");
+                    _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected by one or more approvers", collectionPeriod);
+                    return;
+                }
             }
+            else // paymentsApprovedTask called
+            {
+                if (!htppPaymentsApprovedTask.Result)
+                {   
+                    context.SetCustomStatus("PaymentsRejected");
+                    _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected via http endpoint", collectionPeriod);
+                    return;
+                }
+            }
+
+            context.SetCustomStatus("PaymentsApproved");
 
             context.SetCustomStatus("SendingClawbacksAndPayments");
             _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);

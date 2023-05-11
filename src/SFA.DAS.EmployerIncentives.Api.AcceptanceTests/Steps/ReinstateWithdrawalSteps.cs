@@ -139,7 +139,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings are recalculated")]
         public async Task ThenTheEarningsAreRecalculated()
         {
-
             await using var dbConnection = new SqlConnection(_connectionString);
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
 

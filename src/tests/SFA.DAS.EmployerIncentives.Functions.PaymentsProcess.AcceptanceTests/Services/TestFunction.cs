@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -23,11 +24,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     public class TestFunction : IDisposable
     {
         public const int BusinessCentralPaymentRequestsLimit = 1;
+        
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
         private readonly OrchestrationData _orchestrationData;
         private bool isDisposed;
+        private readonly IHook<ICommand> _commandMessageHook;
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
         public string HubName { get; }
@@ -35,9 +38,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public ObjectResult HttpObjectResult => ResponseObject as ObjectResult;
         public object ResponseObject { get; private set; }
 
-        public TestFunction(TestContext testContext, string hubName)
+        public TestFunction(TestContext testContext, string hubName, IHook<ICommand> commandMessageHook)
         {
             HubName = hubName;
+            _commandMessageHook = commandMessageHook;
             _orchestrationData = new OrchestrationData();
 
             _testContext = testContext;
@@ -45,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                    { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
+                    { "NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
@@ -128,11 +132,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
                                a.ReportsContainerName = testContext.InstanceId;
                            });
+                           s.Configure<PaymentProcessSettings>(a =>
+                           {
+                               a.MetricsReportEmailList = _testContext.PaymentProcessSettings.MetricsReportEmailList;
+                               a.ApprovalReminderPeriodSecs = _testContext.PaymentProcessSettings.ApprovalReminderPeriodSecs;
+                               a.ApprovalReminderRetryAttempts = _testContext.PaymentProcessSettings.ApprovalReminderRetryAttempts;
+                               a.AuthorisationBaseUrl = _testContext.PaymentProcessSettings.AuthorisationBaseUrl;
+                           });
+                           s.Configure<EmailTemplateSettings>(a =>
+                           {
+                               a.MetricsReport = new EmailTemplate { TemplateId = _testContext.MetricsReportEmailGuid.ToString() };
+                           });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
                            s.AddSingleton(typeof(IDateTimeService), _testContext.DateTimeService);
-                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
+                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
+                           s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                           s.AddSingleton(_commandMessageHook);
                        })
                        )
                     .ConfigureServices(s =>

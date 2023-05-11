@@ -85,6 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
             services.Configure<EmployerIncentivesOuterApi>(Configuration.GetSection("EmployerIncentivesOuterApi"));
+            services.Configure<SlackApi>(Configuration.GetSection("Slack"));            
 
             if (!Configuration["EnvironmentName"]
                     .Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))

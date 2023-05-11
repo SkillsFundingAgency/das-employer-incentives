@@ -8,7 +8,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.H
     public interface IHook<T> : IHook
     {
         Action<T> OnReceived { get; set; }
+        Action<T> OnPublished { get; set; }
         Action<T> OnProcessed { get; set; }
-        Action<Exception, T> OnErrored { get; set; }
+        /// <summary>
+        /// return true to suppress the raising of the exception
+        /// </summary>
+        Func<Exception, T, bool> OnErrored { get; set; }
     }
 }

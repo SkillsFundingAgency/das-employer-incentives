@@ -14,6 +14,8 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using SFA.DAS.EmployerIncentives.Reports;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using System.Net;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -39,9 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     options.EnvironmentName = configuration["EnvironmentName"];
                     options.PreFixConfigurationKeys = false;
                 });
-            }
 
-            configBuilder.AddJsonFile("local.settings.json", optional: true);
+                configBuilder.AddJsonFile("local.settings.json", optional: true);
+            }
 
             var config = configBuilder.Build();
             builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config));
@@ -52,6 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<MatchedLearnerApi>(config.GetSection("MatchedLearnerApi"));
             builder.Services.Configure<BusinessCentralApiClient>(config.GetSection("BusinessCentralApi"));
             builder.Services.Configure<EmployerIncentivesOuterApi>(config.GetSection("EmployerIncentivesOuterApi"));
+            builder.Services.Configure<EmailTemplateSettings>(config.GetSection("EmailTemplates"));
+            builder.Services.Configure<PaymentProcessSettings>(config.GetSection("PaymentProcess"));
 
             builder.Services.AddNLog(config);
 
@@ -65,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddEventServices();
             builder.Services.AddReportServices();
 
-            builder.Services.AddNServiceBus(config);            
+            builder.Services.AddNServiceBus(config);
         }
     }
 }
