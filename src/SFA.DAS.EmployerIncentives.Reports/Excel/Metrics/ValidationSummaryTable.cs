@@ -84,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
-            cell.SetCellValue(0); // to not alarm the business!
+            cell.SetCellValue(validationSummary.InvalidRecords.Count);
 
             cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Currency];
