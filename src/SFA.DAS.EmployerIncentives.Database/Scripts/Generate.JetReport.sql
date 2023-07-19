@@ -41,7 +41,7 @@ SELECT
                 [PaymentPeriod],
                 [PaymentYear],
                 [Amount],
-				        ISNULL(p.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
+                ISNULL(p.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
             from [incentives].[Payment] p
             INNER JOIN dbo.Accounts a 
             ON a.AccountLegalEntityId = p.AccountLegalEntityId
@@ -57,7 +57,7 @@ SELECT
                 [CollectionPeriod] as [PaymentPeriod],
                 [CollectionPeriodYear] as [PaymentYear],
                 [Amount],				
-				        ISNULL(c.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
+                ISNULL(c.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
             from [incentives].[ClawbackPayment] c
             INNER JOIN dbo.Accounts a
             ON a.AccountLegalEntityId = c.AccountLegalEntityId
