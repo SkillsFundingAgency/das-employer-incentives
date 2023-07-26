@@ -110,6 +110,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive);
         }
 
+        public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindByAccountLegalEntity(long accountLegalEntityId)
+        {
+            var incentives = await _apprenticeshipIncentiveDataRepository.FindByAccountLegalEntityId(accountLegalEntityId);
+            return (from incentive in incentives
+                select _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive)).ToList();
+        }
+
         public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)
         {
             if (aggregate.IsNew)
