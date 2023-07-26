@@ -12,8 +12,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
@@ -26,12 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly Account _account;
         private HttpResponseMessage _response;
-        private readonly TestContext _testContext;
-
+        
         public LegalEntityDeletedSteps(TestContext testContext) : base(testContext)
         {
             _account = TestContext.TestData.GetOrCreate<Account>();
-            _testContext = testContext;
         }
 
         [When(@"the legal entity is removed from an account")]
