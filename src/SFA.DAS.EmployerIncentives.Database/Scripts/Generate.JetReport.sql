@@ -43,7 +43,7 @@ SELECT
                 [Amount],
                 ISNULL(p.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
             from [incentives].[Payment] p
-            INNER JOIN dbo.Accounts a 
+            LEFT JOIN dbo.Accounts a 
             ON a.AccountLegalEntityId = p.AccountLegalEntityId
             union
             select 
@@ -59,7 +59,7 @@ SELECT
                 [Amount],				
                 ISNULL(c.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
             from [incentives].[ClawbackPayment] c
-            INNER JOIN dbo.Accounts a
+            LEFT JOIN dbo.Accounts a
             ON a.AccountLegalEntityId = c.AccountLegalEntityId
         ) p
   left join [incentives].[PendingPayment] pp on pp.id=p.PendingPaymentId
