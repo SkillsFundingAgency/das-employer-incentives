@@ -760,13 +760,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 {
                     return;
                 }
-                else if (existingFirstCheck != null && (existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value)
-                        || (existingFirstCheck != null && !existingFirstCheck.Result.HasValue && existingFirstCheck.ErrorType != null)) // first check failed or returned error code
+                else if ((existingFirstCheck != null && (existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value)
+                          || (existingFirstCheck != null && !existingFirstCheck.Result.HasValue && existingFirstCheck.ErrorType != null))
+                    && secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date) // first check failed or returned error code
                 {
-                    if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
-                    {
-                        AddEmployedAt365PaymentDueDateSecondCheck(serviceRequest: serviceRequest);
-                    }
+                    AddEmployedAt365PaymentDueDateSecondCheck(serviceRequest: serviceRequest);
                 }
 
                 return;
@@ -992,38 +990,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 {
                     case EmploymentCheckType.EmployedAtStartOfApprenticeship:
 
-                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
-                        {
-                            checks.Add(true);
-                        }
-                        else
-                        {
-                            checks.Add(false);
-                        }
+                        checks.Add(Model.EmploymentCheckModels.Any(c =>
+                            c.CheckType == checkType && c.Result.HasValue && c.Result.Value));
                         break;
 
                     case EmploymentCheckType.EmployedBeforeSchemeStarted:
 
-                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && !c.Result.Value))
-                        {
-                            checks.Add(true);
-                        }
-                        else
-                        {
-                            checks.Add(false);
-                        }
+                        checks.Add(Model.EmploymentCheckModels.Any(c =>
+                            c.CheckType == checkType && c.Result.HasValue && !c.Result.Value));
                         break;
 
                     case EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck:
 
-                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
-                        {
-                            checks.Add(true);
-                        }
-                        else
-                        {
-                            checks.Add(false);
-                        }
+                        checks.Add(Model.EmploymentCheckModels.Any(c =>
+                            c.CheckType == checkType && c.Result.HasValue && c.Result.Value));
                         break;
                 }
             }
