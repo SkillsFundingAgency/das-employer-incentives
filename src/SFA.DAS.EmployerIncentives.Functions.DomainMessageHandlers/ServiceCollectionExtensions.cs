@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 
                 var httpClient = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }

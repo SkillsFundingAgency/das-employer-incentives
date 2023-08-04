@@ -229,7 +229,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 var httpClient = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }
@@ -258,7 +258,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 var client = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }
@@ -284,7 +284,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 var client = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }

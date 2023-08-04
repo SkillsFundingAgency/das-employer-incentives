@@ -233,14 +233,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (stoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
-                ChangeStatus(IncentiveStatus.Stopped);
-                StartBreakInLearning(stoppedStatus.DateStopped.Value);
-
-                CalculateEarnings(collectionCalendar, learner);
-
-                AddEvent(new LearningStopped(
-                    Model.Id,
-                    stoppedStatus.DateStopped.Value));
+                HandleLearningStoppedChangeEvent(learner, collectionCalendar, stoppedStatus);
             }
             else if (Model.Status == IncentiveStatus.Stopped &&
                 !stoppedStatus.LearningStopped &&
@@ -259,14 +252,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else if (Model.Status == IncentiveStatus.Stopped && stoppedStatus.LearningStopped)
             {
-                ChangeStatus(IncentiveStatus.Stopped);
-                StartBreakInLearning(stoppedStatus.DateStopped.Value);
-                CalculateEarnings(collectionCalendar, learner);
-
-                AddEvent(new LearningStopped(
-                    Model.Id,
-                    stoppedStatus.DateStopped.Value));
+                HandleLearningStoppedChangeEvent(learner, collectionCalendar, stoppedStatus);
             }
+        }
+
+        private void HandleLearningStoppedChangeEvent(Learner learner, CollectionCalendar collectionCalendar,
+            LearningStoppedStatus stoppedStatus)
+        {
+            ChangeStatus(IncentiveStatus.Stopped);
+            StartBreakInLearning(stoppedStatus.DateStopped.Value);
+
+            CalculateEarnings(collectionCalendar, learner);
+
+            AddEvent(new LearningStopped(
+                Model.Id,
+                stoppedStatus.DateStopped.Value));
         }
 
         private void AddPayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
@@ -1028,7 +1028,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
             }
 
-            return checks.All(c => c);
+            return checks.TrueForAll(c => c);
         }
 
         private bool CanRefreshEmploymentCheck(EmploymentCheckType employmentCheckType)
