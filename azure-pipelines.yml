@@ -31,7 +31,7 @@ stages:
 - stage: BuildAndTest
   displayName: 'Build and Test'
   jobs:
-  - job: 'BuildAndUnitTest'
+  - job: 'BuildAndTest'
     pool:
       name: 'DAS - Continuous Integration Agents'
       demands:
