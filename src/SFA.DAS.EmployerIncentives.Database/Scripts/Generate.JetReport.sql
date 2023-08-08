@@ -31,32 +31,36 @@ SELECT
     ,cast(ai.SubmittedDate as date) as [Application Date]
   FROM (
             select 
-                [Id], 
+                p.[Id], 
                 [ApprenticeshipIncentiveId],
                 [PendingPaymentId],[AccountId],
-                [AccountLegalEntityId],
+                p.[AccountLegalEntityId],
                 [CalculatedDate],
                 [PaidDate],
                 [SubNominalCode],
                 [PaymentPeriod],
                 [PaymentYear],
                 [Amount],
-				        [VrfVendorId]
-            from [incentives].[Payment] 
+                ISNULL(p.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
+            from [incentives].[Payment] p
+            LEFT JOIN dbo.Accounts a 
+            ON a.AccountLegalEntityId = p.AccountLegalEntityId
             union
             select 
-                [Id], 
+                c.[Id], 
                 [ApprenticeshipIncentiveId],
                 [PendingPaymentId],[AccountId],
-                [AccountLegalEntityId],
+                c.[AccountLegalEntityId],
                 [DateClawbackCreated] as [CalculatedDate],
                 [DateClawBackSent] as [PaidDate],
                 [SubNominalCode],
                 [CollectionPeriod] as [PaymentPeriod],
                 [CollectionPeriodYear] as [PaymentYear],
                 [Amount],				
-				        [VrfVendorId]
-            from [incentives].[ClawbackPayment]
+                ISNULL(c.[VrfVendorId], a.VrfVendorId) AS VrfVendorId
+            from [incentives].[ClawbackPayment] c
+            LEFT JOIN dbo.Accounts a
+            ON a.AccountLegalEntityId = c.AccountLegalEntityId
         ) p
   left join [incentives].[PendingPayment] pp on pp.id=p.PendingPaymentId
   left join Accounts a on a.Id=p.AccountId and a.AccountLegalEntityId = p.AccountLegalEntityId
