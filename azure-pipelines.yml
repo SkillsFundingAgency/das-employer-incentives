@@ -16,7 +16,7 @@ variables:
   value : 'any cpu'
 - name: BuildConfiguration
   value: 'release'
-  - name: containerRegistry
+- name: containerRegistry
   value: 'daspocempincacr'  
 - name: imageRepository
   value: 'empincrepo'    
