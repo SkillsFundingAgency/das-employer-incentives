@@ -21,7 +21,7 @@ variables:
 - name: imageRepository
   value: 'empincrepo'    
 - name: dockerfilePath
-  value: '$(Build.SourcesDirectory)/SFA.DAS.EmployerIncentives.TestHelpers/Images/Dockerfile'
+  value: '$(Build.SourcesDirectory)/src/SFA.DAS.EmployerIncentives.TestHelpers/Images/Dockerfile'
 - name: azureSubscription
   value: 'SFA-DAS-DevTest-ARM'  
 - group: 'BUILD Management Resources'
