@@ -72,6 +72,7 @@ stages:
       name: 'DAS - Continuous Integration Agents'
       demands:
         - Agent.OS -equals Linux
+      dependsOn: 'BuildDacpac'
     workspace:
       clean: all
     steps:
