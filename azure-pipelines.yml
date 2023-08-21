@@ -118,7 +118,7 @@ stages:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download DACPAC Artifact'
       inputs:
-        artifactName: 'Employer Incentives DACPAC'
+        artifactName: 'dacpac'
         itemPattern: SFA.DAS.EmployerIncentives.Database.dacpac
         targetPath: '$(build.ArtifactStagingDirectory)'
 
