@@ -21,7 +21,7 @@ RUN wget -progress=bar:force -q -O sqlpackage.zip https://aka.ms/sqlpackage-linu
 ## TODO : Put following in separate image
 
 ## Add the DACPAC to the image
-COPY C:/azp/agent/_work/1/a/publish/src/SQL.DAS.EmployerIncentives.Database/bin/Release/SFA.DAS.EmployerIncentives.Database.dacpac /tmp/db/db.dacpac
+COPY SFA.DAS.EmployerIncentives.Database.dacpac /tmp/db/db.dacpac
 
 USER mssql
 
