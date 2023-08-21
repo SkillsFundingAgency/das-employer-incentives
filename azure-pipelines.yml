@@ -120,7 +120,7 @@ stages:
       displayName: 'Download DACPAC Artifact'
       inputs:
         artifactName: 'dacpac'
-        itemPattern: '*.dacpac'
+        itemPattern: '**'
         targetPath: '$(build.ArtifactStagingDirectory)'
 
     - task: AzureCLI@2
