@@ -85,9 +85,15 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 
         private void SetDockerFileLocation()
         {
+            var environment = "Local";
+
+            #if Release
+            environment = "BuildServer";
+            #endif
+
             _dockerFileLocation = Path.Combine(
                 Directory.GetCurrentDirectory()[..Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)],
-                $"src/{DockerProjectLocation}/Images/Local/Dockerfile");
+                $"src/{DockerProjectLocation}/Images/{environment}/Dockerfile");
 
             if (!File.Exists(_dockerFileLocation))
                 throw new FileNotFoundException($"Dockerfile not found in: {_dockerFileLocation}. ");
