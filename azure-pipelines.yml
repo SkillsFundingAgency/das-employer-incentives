@@ -120,7 +120,7 @@ stages:
       displayName: 'Download DACPAC Artifact'
       inputs:
         artifactName: 'dacpac'
-        itemPattern: SFA.DAS.EmployerIncentives.Database.dacpac
+        itemPattern: src/SQL.DAS.EmployerIncentives.Database/bin/Release/SFA.DAS.EmployerIncentives.Database.dacpac
         targetPath: '$(build.ArtifactStagingDirectory)'
 
     - task: AzureCLI@2
