@@ -55,7 +55,7 @@ stages:
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
-    - task: CopyFiles@2
+    - task: CopyFiles@1
       displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
       inputs:
         Contents: |
@@ -114,7 +114,14 @@ stages:
         projects: |
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
- 
+
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download DACPAC Artifact'
+      inputs:
+        artifactName: 'Employer Incentives DACPAC'
+        itemPattern: SFA.DAS.EmployerIncentives.Database.dacpac
+        targetPath: '$(build.ArtifactStagingDirectory)'
+
     - task: AzureCLI@2
       displayName: Build image using acr tasks
       inputs:
