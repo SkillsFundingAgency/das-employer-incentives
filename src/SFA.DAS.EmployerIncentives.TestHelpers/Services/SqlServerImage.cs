@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
         {
             _dockerFileLocation = Path.Combine(
                 Directory.GetCurrentDirectory()[..Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)],
-                $"src/{DockerProjectLocation}/Images/Dockerfile");
+                $"src/{DockerProjectLocation}/Images/Local/Dockerfile");
 
             if (!File.Exists(_dockerFileLocation))
                 throw new FileNotFoundException($"Dockerfile not found in: {_dockerFileLocation}. ");
