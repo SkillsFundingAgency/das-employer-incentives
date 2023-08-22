@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     {
         Task<List<IncentiveApplication>> FindIncentiveApplicationsWithoutEarningsCalculations();
         Task<IEnumerable<IncentiveApplication>> Find(long accountLegalEntityId, long uln);
-        Task<IEnumerable<IncentiveApplication>> FindByAccountLegalEntity(long accountLegalEntityId);
     }
 }

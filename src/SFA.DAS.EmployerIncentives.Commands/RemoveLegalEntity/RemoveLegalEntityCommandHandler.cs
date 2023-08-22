@@ -9,14 +9,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
     public class RemoveLegalEntityCommandHandler : ICommandHandler<RemoveLegalEntityCommand>
     {
         private readonly IAccountDomainRepository _accountDomainRepository;
-        private readonly IIncentiveApplicationDomainRepository _incentiveApplicationRepository;
+        private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
 
         public RemoveLegalEntityCommandHandler(IAccountDomainRepository accountDomainRepository,
-            IIncentiveApplicationDomainRepository incentiveApplicationRepository,
+            IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository,
             CancellationToken cancellationToken = default)
         {
             _accountDomainRepository = accountDomainRepository;
-            _incentiveApplicationRepository = incentiveApplicationRepository;
+            _apprenticeshipIncentiveDomainRepository = apprenticeshipIncentiveDomainRepository;
         }
 
         public async Task Handle(RemoveLegalEntityCommand command, CancellationToken cancellationToken = default)
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
                 return;
             }
 
-            var applications = await _incentiveApplicationRepository.FindByAccountLegalEntity(command.AccountLegalEntityId);
+            var applications = await _apprenticeshipIncentiveDomainRepository.FindByAccountLegalEntity(command.AccountLegalEntityId);
 
             if (applications != null && applications.Any())
             {

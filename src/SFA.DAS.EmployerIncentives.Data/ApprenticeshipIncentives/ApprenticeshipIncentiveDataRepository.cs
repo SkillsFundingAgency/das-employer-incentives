@@ -96,6 +96,23 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return apprenticeships.Select(x => x.Incentive.Map(collectionPeriods)).ToList();
         }
 
+        public async Task<List<ApprenticeshipIncentiveModel>> FindByAccountLegalEntityId(long accountLegalEntityId)
+        {
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives
+                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
+                .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
+                .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
+                .Include(x => x.ValidationOverrides)
+                .Where(a => a.AccountLegalEntityId == accountLegalEntityId &&
+                            a.Status != IncentiveStatus.Withdrawn
+                ).ToListAsync();
+            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+            return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
+        }
+
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
             return await Get(x => x.Id == id);

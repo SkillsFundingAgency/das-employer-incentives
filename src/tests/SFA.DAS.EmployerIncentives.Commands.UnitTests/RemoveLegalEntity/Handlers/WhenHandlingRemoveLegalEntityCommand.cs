@@ -1,26 +1,29 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using Account = SFA.DAS.EmployerIncentives.Domain.Accounts.Account;
 
-namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RemoveLegalEntity.Handlers
 {
     [TestFixture]
     public class WhenHandlingRemoveLegalEntityCommand
     {
         private RemoveLegalEntityCommandHandler _sut;
         private Mock<IAccountDomainRepository> _accountDomainRepository;
-        private Mock<IIncentiveApplicationDomainRepository> _incentiveApplicationRepository;
-
-
+        private Mock<IApprenticeshipIncentiveDomainRepository> _incentiveDomainRepository;
+        
         private Fixture _fixture;
 
         [SetUp]
@@ -29,9 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             _fixture = new Fixture();
 
             _accountDomainRepository = new Mock<IAccountDomainRepository>();
-            _incentiveApplicationRepository = new Mock<IIncentiveApplicationDomainRepository>();
+            _incentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
-            _sut = new RemoveLegalEntityCommandHandler(_accountDomainRepository.Object, _incentiveApplicationRepository.Object);
+            _sut = new RemoveLegalEntityCommandHandler(_accountDomainRepository.Object, _incentiveDomainRepository.Object);
         }
 
         [Test]
@@ -58,18 +61,14 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
                     }));
 
 
-            IEnumerable<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication> list = new List<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication>();
-            _incentiveApplicationRepository
-                .Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>()))
-                .Returns(Task.FromResult(list));
-
+            var emptyIncentivesList = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+            _incentiveDomainRepository.Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>())).Returns(Task.FromResult(emptyIncentivesList));
 
             //Act
             await _sut.Handle(command);
 
             //Assert
             _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Count == 2)), Times.Once);
-
         }
 
         [Test]
@@ -98,22 +97,22 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
                         }
                     }));
 
-
-            IEnumerable<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication> list = new List<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication>
+            
+            var list = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
             {
-                Domain.IncentiveApplications.IncentiveApplication.New(Guid.NewGuid(), command.AccountId, command.AccountLegalEntityId)
+                new ApprenticeshipIncentiveFactory().CreateNew(Guid.NewGuid(), Guid.NewGuid(),
+                    _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(),
+                    _fixture.Create<DateTime>(), _fixture.Create<string>(),
+                    new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase3))
             };
-            _incentiveApplicationRepository
-                .Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>()))
-                .Returns(Task.FromResult(list));
 
+            _incentiveDomainRepository.Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>())).Returns(Task.FromResult(list));
+            
             //Act
             await _sut.Handle(command);
 
             //Assert
             _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Count == 3 && i.LegalEntities.FirstOrDefault(x => x.GetModel().HasBeenDeleted == true) != null)), Times.Once);
-           
-
         }
 
         [Test]
@@ -125,10 +124,15 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(null as Account);
 
-            IEnumerable<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication> list = new List<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication>();
-            _incentiveApplicationRepository
-                .Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>()))
-                .Returns(Task.FromResult(list));
+            var list = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
+            {
+                new ApprenticeshipIncentiveFactory().CreateNew(Guid.NewGuid(), Guid.NewGuid(),
+                    _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(),
+                    _fixture.Create<DateTime>(), _fixture.Create<string>(),
+                    new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase3))
+            };
+
+            _incentiveDomainRepository.Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>())).Returns(Task.FromResult(list));
 
             //Act
             await _sut.Handle(command);
@@ -146,10 +150,15 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() { _fixture.Create<LegalEntityModel>() } }));
 
-            IEnumerable<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication> list = new List<SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication>();
-            _incentiveApplicationRepository
-                .Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>()))
-                .Returns(Task.FromResult(list));
+            var list = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
+            {
+                new ApprenticeshipIncentiveFactory().CreateNew(Guid.NewGuid(), Guid.NewGuid(),
+                    _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(),
+                    _fixture.Create<DateTime>(), _fixture.Create<string>(),
+                    new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase3))
+            };
+
+            _incentiveDomainRepository.Setup(x => x.FindByAccountLegalEntity(It.IsAny<long>())).Returns(Task.FromResult(list));
 
             //Act
             await _sut.Handle(command);
