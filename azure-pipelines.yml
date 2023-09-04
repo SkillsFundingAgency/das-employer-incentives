@@ -118,25 +118,25 @@ stages:
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download DACPAC Artifact'
-      inputs:
-        artifactName: 'dacpac'
-        itemPattern: '**'
-        targetPath: $(dockerFileFolder)
+    # - task: DownloadPipelineArtifact@2
+    #   displayName: 'Download DACPAC Artifact'
+    #   inputs:
+    #     artifactName: 'dacpac'
+    #     itemPattern: '**'
+    #     targetPath: $(dockerFileFolder)
 
-    - task: AzureCLI@2
-      displayName: Build image using acr tasks
-      inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          az acr build \
-          --image '$(containerRegistry)/$(imageRepository):$(Build.BuildId)' \
-          --registry $(containerRegistry) \
-          --file $(dockerfilePath) \
-          $(Build.SourcesDirectory)
+    # - task: AzureCLI@2
+    #   displayName: Build image using acr tasks
+    #   inputs:
+    #     azureSubscription: $(azureSubscription)
+    #     scriptType: bash
+    #     scriptLocation: inlineScript
+    #     inlineScript: |
+    #       az acr build \
+    #       --image '$(containerRegistry)/$(imageRepository):$(Build.BuildId)' \
+    #       --registry $(containerRegistry) \
+    #       --file $(dockerfilePath) \
+    #       $(Build.SourcesDirectory)
           
     ##TO DO: move to separate stage, this approach is not compatible with DAS Linux agents
     # - task: CmdLine@2
