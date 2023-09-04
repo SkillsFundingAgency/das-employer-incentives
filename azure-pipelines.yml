@@ -20,8 +20,10 @@ variables:
   value: 'daspocempincacr'  
 - name: imageRepository
   value: 'empincrepo'    
+  name: dockerFileFolder
+  value: '$(Build.SourcesDirectory)/src/SFA.DAS.EmployerIncentives.TestHelpers/Images/BuildServer'
 - name: dockerfilePath
-  value: '$(Build.SourcesDirectory)/src/SFA.DAS.EmployerIncentives.TestHelpers/Images/BuildServer/Dockerfile'
+  value: '$(dockerFileFolder)/Dockerfile'
 - name: azureSubscription
   value: 'SFA-DAS-DevTest-ARM'  
 - group: 'BUILD Management Resources'
@@ -121,7 +123,7 @@ stages:
       inputs:
         artifactName: 'dacpac'
         itemPattern: '**'
-        targetPath: $(dockerfilePath)
+        targetPath: $(dockerFileFolder)
 
     - task: AzureCLI@2
       displayName: Build image using acr tasks
