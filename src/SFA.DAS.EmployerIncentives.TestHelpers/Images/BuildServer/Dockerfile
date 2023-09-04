@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/mssql/server:2019-latest
+﻿FROM mcr.microsoft.com/mssql/server:2019-latest as build
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=Pa55word!
 ENV MSSQL_PID=Developer
@@ -21,7 +21,7 @@ RUN wget -progress=bar:force -q -O sqlpackage.zip https://aka.ms/sqlpackage-linu
 ## TODO : Put following in separate image
 
 ## Add the DACPAC to the image
-COPY ./SFA.DAS.EmployerIncentives.Database.dacpac /tmp/db/db.dacpac
+COPY build/SFA.DAS.EmployerIncentives.Database.dacpac /tmp/db/db.dacpac
 
 USER mssql
 
