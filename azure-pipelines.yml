@@ -20,7 +20,7 @@ variables:
   value: 'daspocempincacr'  
 - name: imageRepository
   value: 'empincrepo'    
-  name: dockerFileFolder
+- name: dockerFileFolder
   value: '$(Build.SourcesDirectory)/src/SFA.DAS.EmployerIncentives.TestHelpers/Images/BuildServer'
 - name: dockerfilePath
   value: '$(dockerFileFolder)/Dockerfile'
