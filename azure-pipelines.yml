@@ -121,6 +121,7 @@ stages:
       inputs:
         artifactName: 'dacpac'
         itemPattern: '**'
+        targetPath: $(dockerfilePath)
 
     - task: AzureCLI@2
       displayName: Build image using acr tasks
