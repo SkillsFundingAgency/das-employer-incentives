@@ -59,7 +59,7 @@ This file takes the format:
 <Property Name="sonar.host.url">https://sonarcloud.io</Property>
 <Property Name="sonar.login">[Your SonarCloud user token]</Property>
 </SonarQubeAnalysisProperties>
-```     
+```
 
 ##### Example:
 
@@ -81,4 +81,14 @@ _docker run [OPTIONS] IMAGE COMMAND_
 
 Execute the analyse.ps1 PowerShell script	    
 
-### Getting Started
+### Running Acceptance Tests Locally
+
+In order to execute acceptance tests from the Visual Studio or ReSharper Test Runner, the following software products must be installed and running:
+
+- Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Run Docker Desktop as Administrator
+- Download, install and run [Azure Storage Emulator](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-emulator) or [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=visual-studio) (this will need to be run as Administrator if running on a Microsoft Azure DevBox)
+
+
+
+When the acceptance tests execute, a temporary docker image will be created with the name `EITEST_{guid}`, using the image `ei-database/test`. This image exists for the lifetime of the acceptance tests' execution.

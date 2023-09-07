@@ -27,7 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             _accountLegalEntityId = _fixture.Create<long>();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid())
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
