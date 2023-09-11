@@ -20,6 +20,7 @@ INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2021', '2021-07-31')
 INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2122', '2022-07-31')
 INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2223', '2023-07-31')
 INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2324', '2024-07-31')
+INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2425', '2025-07-31')
 
 PRINT '********************* Updating table [incentives].[AcademicYear] *****************************'
 
@@ -111,6 +112,19 @@ INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYea
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (46, 10, 5, 2024, CAST(N'2024-05-09T00:00:00.0000000' AS DateTime2), CAST(N'2024-05-31T00:00:00.000' AS DateTime), N'2324', 0)
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (47, 11, 6, 2024, CAST(N'2024-06-10T00:00:00.0000000' AS DateTime2), CAST(N'2024-06-30T00:00:00.000' AS DateTime), N'2324', 0)
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (48, 12, 7, 2024, CAST(N'2024-07-08T00:00:00.0000000' AS DateTime2), CAST(N'2024-07-31T00:00:00.000' AS DateTime), N'2324', 0)
+
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (49, 1, 8, 2024, CAST(N'2024-08-08T00:00:00.0000000' AS DateTime2), CAST(N'2024-08-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (50, 2, 9, 2024, CAST(N'2024-09-09T00:00:00.0000000' AS DateTime2), CAST(N'2024-09-30T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (51, 3, 10, 2024, CAST(N'2024-10-08T00:00:00.0000000' AS DateTime2), CAST(N'2024-10-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (52, 4, 11, 2024, CAST(N'2024-11-08T00:00:00.0000000' AS DateTime2), CAST(N'2024-11-30T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (53, 5, 12, 2024, CAST(N'2024-12-09T00:00:00.0000000' AS DateTime2), CAST(N'2024-12-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (54, 6, 1, 2025, CAST(N'2025-01-08T00:00:00.0000000' AS DateTime2), CAST(N'2025-01-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (55, 7, 2, 2025, CAST(N'2025-02-10T00:00:00.0000000' AS DateTime2), CAST(N'2025-02-29T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (56, 8, 3, 2025, CAST(N'2025-03-10T00:00:00.0000000' AS DateTime2), CAST(N'2025-03-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (57, 9, 4, 2025, CAST(N'2025-04-08T00:00:00.0000000' AS DateTime2), CAST(N'2025-04-30T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (58, 10, 5, 2025, CAST(N'2025-05-08T00:00:00.0000000' AS DateTime2), CAST(N'2025-05-31T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (59, 11, 6, 2025, CAST(N'2025-06-09T00:00:00.0000000' AS DateTime2), CAST(N'2025-06-30T00:00:00.000' AS DateTime), N'2425', 0)
+INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (60, 12, 7, 2025, CAST(N'2025-07-08T00:00:00.0000000' AS DateTime2), CAST(N'2025-07-31T00:00:00.000' AS DateTime), N'2425', 0)
 
 PRINT '********************* Updating table [incentives].[CollectionCalendar] *****************************'
 
