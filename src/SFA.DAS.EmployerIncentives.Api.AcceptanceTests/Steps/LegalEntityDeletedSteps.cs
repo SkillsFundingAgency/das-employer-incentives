@@ -105,7 +105,35 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response = await EmployerIncentiveApi.Client.GetAsync($"/accounts/{_account.Id}/legalentity/{_account.AccountLegalEntityId}/applications");
             var json = await _response.Content.ReadAsStringAsync();
             var getApplicationsResponse = JsonConvert.DeserializeObject<GetApplicationsResponse>(json);
-            getApplicationsResponse.ApprenticeApplications.Should().BeEmpty();
+            getApplicationsResponse.ApprenticeApplications.Should().BeEmpty(); // Withdrawn applications are excluded from the list
+
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
+            
+            var accountIncentives = incentives.Where(x => x.AccountId == _account.Id);
+            foreach(var accountIncentive in accountIncentives)
+            {
+                accountIncentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+                accountIncentive.WithdrawnBy.Should().Be("Employer");
+            }
+
+            var applications = await dbConnection.GetAllAsync<IncentiveApplication>();
+            var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
+            var accountApplications = applications.Where(x => x.AccountId == _account.Id);
+            var auditRecords = await dbConnection.GetAllAsync<IncentiveApplicationStatusAudit>();
+            foreach (var accountApplication in accountApplications)
+            {
+                var accountApprenticeships = apprenticeships.Where(x => x.IncentiveApplicationId == accountApplication.Id);
+                foreach(var accountApprenticeship in accountApprenticeships)
+                {
+                    accountApprenticeship.WithdrawnByEmployer.Should().BeTrue();
+                    var apprenticeshipAuditRecord = auditRecords.SingleOrDefault(x => x.IncentiveApplicationApprenticeshipId == accountApprenticeship.Id);
+                    apprenticeshipAuditRecord.Should().NotBeNull();
+                    apprenticeshipAuditRecord.Process.Should().Be("EmployerWithdrawn");
+                    apprenticeshipAuditRecord.ServiceRequestDecisionReference.Should().Be("LegalEntityRemoved");
+                }
+            }
+
         }
 
         [Then(@"the legal entity should still have an account")]
