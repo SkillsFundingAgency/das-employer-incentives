@@ -15,7 +15,7 @@ CREATE procedure [support].[PaymentEnquiry]
 	@hashedlegalentityid varchar(8)=''
 )
 AS
-	select Uln,
+	select  ULN,
 			[SubmissionFound], 
 			[LearningFound], 
 			[HasDataLock], 
@@ -26,7 +26,7 @@ AS
 			NumberOfDaysInLearning,
 			lp.FirstLearning,
 			convert(datetime,l.UpdatedDate,101) as [ILRDataUpdated],
-			sum(pp.amount) as [EarningAmount], 
+			sum(pp.Amount) as [EarningAmount], 
 			convert(nvarchar(10),pp.DueDate,126) as EarningDueDate, 
 			pp.PeriodNumber as [EarningPeriod],
 			pp.PaymentYear as [EarningYear], 
@@ -36,16 +36,16 @@ AS
 			a.VrfVendorId,
 			HashedLegalEntityId
 	from [incentives].[Learner] l
-	left join (select id, AccountLegalEntityId, case when PausePayments = 1 then 1 else 0 end as PausedPayments from [incentives].[ApprenticeshipIncentive]) ai on ai.Id = l.ApprenticeshipIncentiveId
-	left join (select AccountLegalEntityId, case when vrfvendorid is not null then 1 else 0 end as HasBank from [dbo].[Accounts] a) q on ai.AccountLegalEntityId = q.AccountLegalEntityId
+	left join (select Id, AccountLegalEntityId, case when PausePayments = 1 then 1 else 0 end as PausedPayments from [incentives].[ApprenticeshipIncentive]) ai on ai.Id = l.ApprenticeshipIncentiveId
+	left join (select AccountLegalEntityId, case when VrfVendorId is not null then 1 else 0 end as HasBank from [dbo].[Accounts] a) q on ai.AccountLegalEntityId = q.AccountLegalEntityId
 	left join [incentives].[PendingPayment] pp on pp.ApprenticeshipIncentiveId = l.ApprenticeshipIncentiveId
-	left join (select learnerid, case when NumberOfDaysInLearning >= 90 then 1 else 0 end as [DaysInLearning], NumberOfDaysInLearning from [incentives].[ApprenticeshipDaysInLearning]) adil on adil.LearnerId=l.Id
+	left join (select LearnerId, case when NumberOfDaysInLearning >= 90 then 1 else 0 end as [DaysInLearning], NumberOfDaysInLearning from [incentives].[ApprenticeshipDaysInLearning]) adil on adil.LearnerId=l.Id
 	left join [dbo].[Accounts] a on a.AccountLegalEntityId=pp.AccountLegalEntityId
-	left join [incentives].[Payment] p on p.PendingPaymentId=pp.id
-	left join (select LearnerId,min(startdate) as FirstLearning from [incentives].[LearningPeriod] group by LearnerId) lp on lp.LearnerId=l.Id
+	left join [incentives].[Payment] p on p.PendingPaymentId=pp.Id
+	left join (select LearnerId,min(StartDate) as FirstLearning from [incentives].[LearningPeriod] group by LearnerId) lp on lp.LearnerId=l.Id
 	where 1=1
-	and (a.VrfVendorId=@vendorid or uln=@uln or HashedLegalEntityId=@hashedlegalentityid)
-	group by Uln,
+	and (a.VrfVendorId=@vendorid or ULN=@uln or HashedLegalEntityId=@hashedlegalentityid)
+	group by ULN,
 			[SubmissionFound], 
 			[LearningFound], 
 			[HasDataLock], 
@@ -64,6 +64,6 @@ AS
 			p.PaidDate, 
 			a.VrfVendorId, 
 			HashedLegalEntityId
-	order by uln, pp.PaymentYear,pp.PeriodNumber
+	order by ULN, pp.PaymentYear,pp.PeriodNumber
 
 Return @@rowcount

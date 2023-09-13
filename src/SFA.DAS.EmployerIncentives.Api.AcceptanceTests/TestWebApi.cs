@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<MatchedLearnerApi>(l =>
                 {
                     l.ApiBaseUrl = _context.LearnerMatchApi.BaseAddress;
-                    l.Identifier = "";
+                    l.IdentifierUri = "";
                     l.Version = "1.0";
                 });
                 s.Configure<EmployerIncentivesOuterApi>(l =>

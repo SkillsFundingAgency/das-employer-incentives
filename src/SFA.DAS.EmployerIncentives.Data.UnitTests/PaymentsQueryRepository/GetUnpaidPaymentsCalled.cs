@@ -16,8 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentsQueryRepository
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private IPaymentsQueryRepository _sut;
-        short _collectionPeriodYear = 2020;
-        byte _collectionPeriodMonth = 5;
         private Payment _payment1;
         private PendingPayment _pendingPayment1;
         private Models.Account _account1;

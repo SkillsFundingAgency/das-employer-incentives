@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
-        public void ValidatePendingPaymentException_is_thrown_on_error()
+        public Task ValidatePendingPaymentException_is_thrown_on_error()
         {
             // Arrange
             var testException = new Exception(Guid.NewGuid().ToString());
@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             Func<Task> action = async () => await _sut.Validate(_payment);
 
             //Assert
-            action.Should().Throw<Exception>().WithMessage($"failed to validate ApprenticeshipIncentiveId : {_payment.ApprenticeshipIncentiveId}, PendingPaymentId : {_payment.PendingPaymentId}, Message : {testException.Message} ");
+            return action.Should().ThrowAsync<Exception>().WithMessage($"failed to validate ApprenticeshipIncentiveId : {_payment.ApprenticeshipIncentiveId}, PendingPaymentId : {_payment.PendingPaymentId}, Message : {testException.Message} ");
         }
     }
 }

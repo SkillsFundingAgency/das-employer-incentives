@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions
 {
@@ -17,7 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions
             PendingPaymentId = pendingPaymentId;
         }
 
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         protected ValidatePendingPaymentException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -25,12 +23,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions
             PendingPaymentId = new Guid(info.GetString(nameof(PendingPaymentId)));
         }
 
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
             {
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
             }
 
             info.AddValue(nameof(ApprenticeshipIncentiveId), ApprenticeshipIncentiveId.ToString());

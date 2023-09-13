@@ -3,13 +3,13 @@
 
 with PendingPaymentValidations as (
 	select	PendingPaymentId, 
-			max(iif(step='HasIlrSubmission',1,0)) as HasIlrSubmission,
-			max(iif(step='HasLearningRecord',1,0)) as HasLearningRecord,
-			max(iif(step='IsInLearning',1,0)) as IsInLearning,
-			max(iif(step='HasDaysInLearning',1,0)) as HasDaysInLearning,
-			max(iif(step='HasNoDataLocks',1,0)) as HasNoDataLocks,
-			max(iif(step='HasBankDetails',1,0)) as HasBankDetails,
-			max(iif(step='PaymentsNotPaused',1,0)) as PaymentsNotPaused,
+			max(iif(Step='HasIlrSubmission',1,0)) as HasIlrSubmission,
+			max(iif(Step='HasLearningRecord',1,0)) as HasLearningRecord,
+			max(iif(Step='IsInLearning',1,0)) as IsInLearning,
+			max(iif(Step='HasDaysInLearning',1,0)) as HasDaysInLearning,
+			max(iif(Step='HasNoDataLocks',1,0)) as HasNoDataLocks,
+			max(iif(Step='HasBankDetails',1,0)) as HasBankDetails,
+			max(iif(Step='PaymentsNotPaused',1,0)) as PaymentsNotPaused,
 			Result,
 			PeriodNumber, 
 			PaymentYear

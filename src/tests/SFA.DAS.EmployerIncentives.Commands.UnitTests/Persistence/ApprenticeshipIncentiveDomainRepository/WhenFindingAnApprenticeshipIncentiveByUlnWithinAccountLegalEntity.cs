@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
         }
 
         [Test]
-        public async Task Then_when_multiple_matches_exist_it_throws_is_InvalidIncentiveException()
+        public Task Then_when_multiple_matches_exist_it_throws_is_InvalidIncentiveException()
         {
             // Arrange
             _mockApprenticeshipIncentiveDataRepository
@@ -99,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
             Func<Task> act = async () => await _sut.FindByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
 
             // Assert
-            act.Should().Throw<InvalidIncentiveException>();
+            return act.Should().ThrowAsync<InvalidIncentiveException>();
         }        
     }
 }

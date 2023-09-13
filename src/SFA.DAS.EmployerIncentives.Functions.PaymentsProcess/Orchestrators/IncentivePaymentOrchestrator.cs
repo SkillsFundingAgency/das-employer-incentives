@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             context.SetCustomStatus("ClawbacksAndPaymentsSent");
 
             context.SetCustomStatus("CompletingPaymentProcessing");
-            await context.CallActivityAsync(nameof(CompletePaymentProcess), new CompletePaymentProcessInput { CompletionDateTime = DateTime.UtcNow, CollectionPeriod = collectionPeriod });
+            await context.CallActivityAsync(nameof(CompletePaymentProcess), new CompletePaymentProcessInput { CompletionDateTime = context.CurrentUtcDateTime, CollectionPeriod = collectionPeriod });
             context.SetCustomStatus("PaymentProcessingCompleted");
 
             _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);

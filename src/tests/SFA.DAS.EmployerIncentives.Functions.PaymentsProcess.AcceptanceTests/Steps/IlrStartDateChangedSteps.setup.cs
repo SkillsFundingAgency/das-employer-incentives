@@ -128,10 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/LearnerMatchingOrchestrator")
                     }
                 ));
         }

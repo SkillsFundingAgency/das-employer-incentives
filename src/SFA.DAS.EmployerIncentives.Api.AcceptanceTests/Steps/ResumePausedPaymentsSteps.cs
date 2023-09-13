@@ -181,7 +181,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed the apprenticeship incentive pause request has been queued")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveHasResumed()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payment Resume Request(s) have been successfully queued");
         }
@@ -189,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed the apprenticeship incentive is not paused")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsNotPaused()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments are not paused");
         }
@@ -197,7 +197,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed the request is invalid")]
         public async Task ThenTheRequesterIsInformedTheRequestIsInvalid()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("not set");
         }

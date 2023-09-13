@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         }
 
         [Test]
-        public void Then_an_InvalidRequestException_is_raised_when_the_validator_returns_a_null_result()
+        public Task Then_an_InvalidRequestException_is_raised_when_the_validator_returns_a_null_result()
         {
             //Arrange
             var command = _fixture.Create<TestCommand>();
@@ -62,11 +62,11 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should().Throw<InvalidRequestException>();
+            return action.Should().ThrowAsync<InvalidRequestException>();
         }
 
         [Test]
-        public void Then_an_InvalidRequestException_is_raised_when_the_command_is_not_valid()
+        public Task Then_an_InvalidRequestException_is_raised_when_the_command_is_not_valid()
         {
             //Arrange
             var command = _fixture.Create<TestCommand>();
@@ -81,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should().Throw<InvalidRequestException>();
+            return action.Should().ThrowAsync<InvalidRequestException>();
         }
 
         [Test]

@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<ArgumentException>().WithMessage($"Pending payment with ID {command.PendingPaymentId} not found");
+            action.Should().ThrowAsync<ArgumentException>().WithMessage($"Pending payment with ID {command.PendingPaymentId} not found");
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<ArgumentException>().WithMessage($"Apprenticeship incentive with ID {archivedPendingPayment.ApprenticeshipIncentiveId} for pending payment ID {archivedPendingPayment.Id} not found");
+            action.Should().ThrowAsync<ArgumentException>().WithMessage($"Apprenticeship incentive with ID {archivedPendingPayment.ApprenticeshipIncentiveId} for pending payment ID {archivedPendingPayment.Id} not found");
         }
     }
 }

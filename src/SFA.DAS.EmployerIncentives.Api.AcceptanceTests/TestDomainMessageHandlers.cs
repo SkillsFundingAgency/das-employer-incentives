@@ -73,21 +73,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<ApplicationSettings>(a =>
                 {
                     a.ApiBaseUrl = _testContext.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
-                    a.Identifier = "";
+                    a.IdentifierUri = "";
                 });
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
                 s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
                 s.Decorate<ICommandService, CommandServiceWithLogging>();
-                
+
                 s.AddNServiceBus(
                     new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
                     (o) =>
                     {
                         o.EndpointConfiguration = (endpoint) =>
                         {
-                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
-                            Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
+                            endpoint.UseTransport<LearningTransport>()
+                                    .StorageDirectory(_testMessageBus.StorageDirectory.FullName);
+                            
                             return endpoint;
                         };
 
@@ -132,8 +133,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public async Task Stop()
         {
-            await host.StopAsync(_testContext.CancellationToken);
-
             var stopEndpointTasks = new List<Task>();
 
             foreach (var endpoint in _receivingRawEndpoints)
@@ -141,6 +140,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 stopEndpointTasks.Add(StopEndpoint(endpoint));
             }
             await Task.WhenAll(stopEndpointTasks);
+
+            host.Dispose();            
         }
 
         private async Task StopEndpoint(IReceivingRawEndpoint endpoint)

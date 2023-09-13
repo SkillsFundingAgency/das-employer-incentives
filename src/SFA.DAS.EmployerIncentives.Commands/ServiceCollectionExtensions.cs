@@ -229,7 +229,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 var httpClient = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }
@@ -251,14 +251,14 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithDefaultHeaders()
                     .WithLogging(s.GetService<ILoggerFactory>());
 
-                if (!string.IsNullOrEmpty(settings.Identifier))
+                if (!string.IsNullOrEmpty(settings.IdentifierUri))
                 {
                     clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
                 }
 
                 var client = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }
@@ -284,7 +284,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 var client = clientBuilder.Build();
 
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+                if (!settings.ApiBaseUrl.EndsWith('/'))
                 {
                     settings.ApiBaseUrl += "/";
                 }
@@ -310,7 +310,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             var endpointConfiguration = new EndpointConfiguration(endpointName)
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                .UseOutbox(true)
+                .UseOutbox(true)                
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
@@ -320,10 +320,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
-                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory",
+                    .StorageDirectory(configuration["ApplicationSettings:UseLearningEndpointStorageDirectory"] ??
                         Path.Combine(
                             Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
-                            @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                            @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport"));
+
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
@@ -336,7 +337,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
             }
-
+                        
             var endpoint = await Endpoint.Start(endpointConfiguration);
 
             serviceProvider.AddSingleton(p => endpoint)
@@ -352,15 +353,17 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
                 EmployerIncentivesDbContext dbContext;
-                try
+                
+                var synchronizedStorageSession = unitOfWorkContext.Find<SynchronizedStorageSession>();
+
+                if(synchronizedStorageSession != null)
                 {
-                    var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
                     var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
                     dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
-                catch (KeyNotFoundException)
+                else
                 {
                     var settings = p.GetService<IOptions<ApplicationSettings>>();
                     var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings.Value.DbConnectionString);

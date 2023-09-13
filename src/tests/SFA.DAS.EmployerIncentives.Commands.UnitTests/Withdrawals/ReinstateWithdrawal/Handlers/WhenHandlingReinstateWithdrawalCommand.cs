@@ -126,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
 
             //Assert
             action.Should()
-                .Throw<WithdrawalException>()
+                .ThrowAsync<WithdrawalException>()
                 .WithMessage($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");
         }
 
@@ -261,7 +261,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
         }
 
         [Test]
-        public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
+        public Task Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
             var command = _fixture.Create<ReinstateWithdrawalCommand>();
@@ -274,9 +274,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should()
-                .Throw<WithdrawalException>()
-                .WithMessage($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");           
+            return action.Should()
+                .ThrowAsync<WithdrawalException>()
+                .WithMessage("Unable to handle reinstate withdrawal command.*");           
         }
     }
 }

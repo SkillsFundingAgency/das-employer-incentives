@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentDataRepository
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
-            var account = new Models.Account { AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>() };
+            var account = new Models.Account { LegalEntityName = _fixture.Create<string>(), AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>() };
             var payments = _fixture
                 .Build<Payment>()
                 .Without(p => p.PaidDate)
@@ -84,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentDataRepository
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
-            var account = new Models.Account {AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>()};
+            var account = new Models.Account { LegalEntityName = _fixture.Create<string>(), AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>()};
             var payments = _fixture
                 .Build<Payment>()
                 .Without(p => p.PaidDate)

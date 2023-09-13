@@ -24,7 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         [SetUp]
         public async Task SetUp()
         {
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
+                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid())
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));

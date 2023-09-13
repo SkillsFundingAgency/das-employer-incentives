@@ -3,7 +3,6 @@ using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
@@ -192,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"the latest learner data has active in learning data")]
         public void AndTheLatestLearnerDataHasInLearningData()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning);
         }
 
         [Given(@"learner service caching is enabled")]
@@ -204,13 +203,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"the latest learner data has a data locked price episode")]
         public void GivenLatestLearnerDataHasADataLockedPriceEpisode()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.Course_Price_Dlock_R03);
         }
 
         [Given(@"the latest learner data has training entries for a different apprenticeship")]
         public void GivenLatestLearnerDataHasNoPriceEpisodeForCurrentPeriod()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_DifferentApprenticeship_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_DifferentApprenticeship);
         }
 
         [Given(@"the latest learner data has no training entries")]
@@ -222,13 +221,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"the latest learner data has no ZPROG001 training entries")]
         public void GivenLatestLearnerDataHasNoZPROG001TrainingEntries()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoZPROG001_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoZPROG001);
         }
 
         [Given(@"the latest learner data has a matching in-break training episode")]
         public void GivenTheLatestLearnerDataHasAMatchingIn_BreakTrainingEpisode()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InBreak_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InBreak);
         }
 
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
@@ -240,10 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"api/orchestrators/LearnerMatchingOrchestrator")
                     }
                     ));
         }
@@ -251,19 +247,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"the latest learner data has a matching training episode with no end date")]
         public void GivenTheLatestLearnerDataHasAMatchingTrainingEpisodeWithNoEndDate()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoEndDate_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoEndDate);
         }
 
         [Given(@"the latest learner data has no payable price episodes")]
         public void GivenTheLatestLearnerDataHasNoPayablePriceEpisodes()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable);
         }
 
         [Given(@"a change of circumstances start date is made")]
         public void GivenAChangeOfCircumstancesStartDateIsMade()
         {
-            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.StartDateChange_json);
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.StartDateChange);
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
@@ -307,7 +303,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_submissionDate);
-            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning);
             createdLearner.StartDate.Should().Be(_startDate);
 
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
@@ -342,7 +338,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_submissionDate);
-            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning);
             createdLearner.StartDate.Should().Be(_startDate);
 
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
@@ -380,7 +376,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(DateTime.Parse("2020-11-09 17:04:31.407", new CultureInfo("en-GB")));
-            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.Course_Price_Dlock_R03);
             createdLearner.StartDate.Should().Be(_startDate);
         }
 
@@ -449,7 +445,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_submissionDate);
-            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable_json);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable);
             createdLearner.StartDate.Should().Be(_startDate);
 
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));

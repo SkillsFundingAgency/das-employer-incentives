@@ -8,10 +8,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Binding]
     public class TestCleanUp
     {
-        private readonly TestContext _context;
+        private readonly AcceptanceTests.TestContext _context;
         private readonly CancellationTokenSource _tokenSource;
 
-        public TestCleanUp(TestContext context)
+        public TestCleanUp(AcceptanceTests.TestContext context)
         {         
             _context = context;
             _tokenSource = new CancellationTokenSource();
@@ -34,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             try
             {
+                Console.WriteLine($"TESTRUN: TestDirectory delete");
                 Directory.Delete(_context.TestDirectory.FullName, true);
             }
             catch(Exception){}

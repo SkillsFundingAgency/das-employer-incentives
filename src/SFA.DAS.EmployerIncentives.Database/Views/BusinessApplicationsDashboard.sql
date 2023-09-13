@@ -15,10 +15,10 @@
 			left join	  (SELECT 
 							[IncentiveApplicationId],
 							count(*) as Learners,
-							status
+							[Status]
 							FROM [dbo].[IncentiveApplicationApprenticeship] iaa2
 							left join [dbo].[IncentiveApplication] ia2 on ia2.Id=iaa2.IncentiveApplicationId
-							group by [IncentiveApplicationId], status
+							group by [IncentiveApplicationId], [Status]
 						  ) q on  q.IncentiveApplicationId = iaa.IncentiveApplicationId
 			left join	  (SELECT   ai.IncentiveApplicationApprenticeshipId,				
 							sum(pp.Amount) as TotalIncentiveAmount
@@ -29,6 +29,6 @@
 							GROUP BY ai.IncentiveApplicationApprenticeshipId
 						  ) p on  p.IncentiveApplicationApprenticeshipId= iaa.Id	
 		where
-			q.status = 'Submitted'
+			q.Status = 'Submitted'
 		group by 
 			month(PlannedStartDate), year(PlannedStartDate)

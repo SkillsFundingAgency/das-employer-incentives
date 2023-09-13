@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+﻿using DurableTask.Core.Common;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -17,23 +18,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             _featureContext = featureContext;
         }
 
-        [BeforeScenario()]
+        [BeforeScenario(Order = 3)]
         public async Task InitialiseHost()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _testContext.TestFunction = new TestFunction(_testContext, $"TEST{_featureContext.FeatureInfo.Title}");
+            _testContext.TestFunction = new TestFunction(_testContext, $"{TestContext.TestPrefix}{_testContext.InstanceId[..8]}{_featureContext.FeatureInfo.Title}".Truncate(45));
             await _testContext.TestFunction.StartHost();
             stopwatch.Stop();
             Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 2)]
         public async Task Cleanup()
-        { 
+        {            
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            await _testContext.TestFunction.DisposeAsync();
+            await _testContext.TestFunction?.DisposeAsync();
             stopwatch.Stop();
             Console.WriteLine($"Time it took to Cleanup  FunctionsHost: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
         }

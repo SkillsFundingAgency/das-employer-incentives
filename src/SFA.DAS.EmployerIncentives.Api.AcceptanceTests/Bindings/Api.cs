@@ -2,6 +2,7 @@
 using NServiceBus;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
@@ -13,9 +14,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "api")]
     public class Api
     {
-        private readonly TestContext _context;
+        private readonly AcceptanceTests.TestContext _context;
 
-        public Api(TestContext context)
+        public Api(AcceptanceTests.TestContext context)
         {
             _context = context;
         }
@@ -38,12 +39,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 2)]
         public async Task CleanUp()
         {
+            Console.WriteLine($"TESTRUN: Api CleanUp");
             var endpoint = _context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
             if(endpoint != null)
             {
+                Console.WriteLine($"TESTRUN: Api endpoint stop");
                 await endpoint.Stop();
             }
             _context.EmployerIncentivesWebApiFactory.Server?.Dispose();

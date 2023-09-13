@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,10 +8,11 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 {
+    [ExcludeFromCodeCoverage]
     public static class WaitForFunction
     {
         [FunctionName(nameof(WaitForFunction))]
-        [NoAutomaticTrigger]
+        [NoAutomaticTrigger]        
         public static async Task Run([DurableClient] IDurableOrchestrationClient client, string name, TimeSpan? timeout, string expectedCustomStatus)
         {
             using var cts = new CancellationTokenSource();
@@ -25,7 +27,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         private static bool OrchestrationsCompleteOrAwaitingInput(string orchestratorName, string expectedCustomStatus, DurableOrchestrationStatus orchestrationStatus)
         {
             var customStatus = orchestrationStatus.CustomStatus.ToObject<string>();
-            return orchestrationStatus.Name != orchestratorName || (expectedCustomStatus != null && customStatus == expectedCustomStatus);
+            
+            return orchestrationStatus.Name != orchestratorName ||
+                (expectedCustomStatus != null && customStatus == expectedCustomStatus) ||
+                (expectedCustomStatus == null && orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed);
         }
     }
 }

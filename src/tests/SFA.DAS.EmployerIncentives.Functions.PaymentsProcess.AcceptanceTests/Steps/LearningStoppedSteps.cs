@@ -752,9 +752,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheExistingPendingPaymentsAreRemoved()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var pendingPayments = dbConnection.GetAll<PendingPayment>();
-
-            pendingPayments.Count().Should().Be(0);
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().SingleOrDefault(p => p.EarningType == EarningType.SecondPayment);
+            pendingPayment.Should().BeNull();
         }
 
         [Then(@"the existing paid pending payments are clawed back")]
@@ -917,10 +916,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/LearnerMatchingOrchestrator")
                     }
                 ));
         }

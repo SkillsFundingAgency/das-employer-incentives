@@ -41,6 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             //Act
             await _sut.SendPaymentRequests(new List<Payment> { payment });
+
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
@@ -104,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             {
                 exception.Message.Should().StartWith("Business Central API is unavailable and returned an internal");
                 var delimiter = "Data sent: ";
-                var json = exception.Message.Substring(exception.Message.IndexOf(delimiter) + delimiter.Length - 1);
+                var json = exception.Message[(exception.Message.IndexOf(delimiter) + delimiter.Length - 1)..];
                 var paymentRequests = JsonConvert.DeserializeObject<PaymentRequestContainer>(json);
                 foreach(var paymentRequest in paymentRequests.PaymentRequests)
                 {
@@ -128,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.Unauthorized)]
         [TestCase(HttpStatusCode.Forbidden)]
-        public async Task Then_the_payment_is_posted_and_we_get_an_access_error_from_business_central_api(HttpStatusCode statusCode)
+        public Task Then_the_payment_is_posted_and_we_get_an_access_error_from_business_central_api(HttpStatusCode statusCode)
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(statusCode);
@@ -137,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             //Act
             Func<Task> act = async () => await _sut.SendPaymentRequests(new List<Payment> { payment });
 
-            act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API returned*");
+            return act.Should().ThrowAsync<BusinessCentralApiException>().WithMessage("Business Central API returned*");
         }
 
         [Test]

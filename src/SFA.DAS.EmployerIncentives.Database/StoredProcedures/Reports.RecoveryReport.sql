@@ -33,7 +33,7 @@ AS
 		@SQL NVARCHAR(MAX) = '',
 		@QUERY NVARCHAR(MAX) = ''
 			
-	SET @periodIdStart = (SELECT ID FROM [incentives].[CollectionCalendar] WHERE Active = 1) 
+	SET @periodIdStart = (SELECT Id FROM [incentives].[CollectionCalendar] WHERE Active = 1) 
 	SET @3MonthPeriodId = @periodIdStart + 2
 	SET @12MonthPeriodId = @periodIdStart + 11
 

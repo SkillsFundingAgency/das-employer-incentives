@@ -88,10 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
-                        },
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"),
                         ["collectionPeriodYear"] = CollectionPeriodYear,
                         ["collectionPeriodNumber"] = CollectionPeriod
                     },
@@ -114,10 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/LearnerMatchingOrchestrator")
                     }
                 ));
         }

@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
 
         [SetUp]
-        public async Task ArrangeAsync()
+        public void ArrangeAsync()
         {
             var today = new DateTime(2021, 1, 30);
 
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
-            _incentive = await ApprenticeshipIncentiveCreator();
+            _incentive = ApprenticeshipIncentiveCreator();
 
             _sut = new CreatePaymentCommandHandler(_mockIncentiveDomainRespository.Object);
         }
@@ -100,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             itemsPersisted.Should().Be(1);
         }
 
-        private async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> ApprenticeshipIncentiveCreator()
+        private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive ApprenticeshipIncentiveCreator()
         {
             var today = new DateTime(2021, 1, 30);
 

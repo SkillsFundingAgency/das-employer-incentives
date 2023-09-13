@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "learnerMatchApi")]
     public class LearnerMatchApi
     {
-        private readonly TestContext _context;
+        private readonly AcceptanceTests.TestContext _context;
 
-        public LearnerMatchApi(TestContext context)
+        public LearnerMatchApi(AcceptanceTests.TestContext context)
         {
             _context = context;            
         }

@@ -98,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         }
 
         [Test]
-        public void Then_a_handler_exception_is_propogated()
+        public Task Then_a_handler_exception_is_propogated()
         {
             //Arrange
             var command = new TestCommand();
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should().Throw<Exception>().WithMessage(errorMessage);
+            return action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
         }
     }
 }

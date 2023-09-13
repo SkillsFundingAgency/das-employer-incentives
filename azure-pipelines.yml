@@ -16,6 +16,16 @@ variables:
   value : 'any cpu'
 - name: BuildConfiguration
   value: 'release'
+- name: containerRegistry
+  value: 'daspocempincacr'  
+- name: imageRepository
+  value: 'empincrepo'    
+- name: dockerFileFolder
+  value: '$(Build.SourcesDirectory)/src/SFA.DAS.EmployerIncentives.TestHelpers/Images/BuildServer'
+- name: dockerfilePath
+  value: '$(dockerFileFolder)/Dockerfile'
+- name: azureSubscription
+  value: 'SFA-DAS-DevTest-ARM'  
 - group: 'BUILD Management Resources'
 
 resources:
@@ -24,18 +34,47 @@ resources:
   - repository: das-platform-building-blocks
     type: github
     name: SkillsFundingAgency/das-platform-building-blocks
-    ref: refs/tags/2.1.0
+    ref: refs/tags/2.1.4
     endpoint: SkillsFundingAgency
 
 stages:
 - stage: BuildAndTest
   displayName: 'Build and Test'
   jobs:
-  - job: 'BuildAndTest'
+  - job: 'BuildDacpac'
     pool:
       name: 'DAS - Continuous Integration'
       demands:
-        - Agent.OS -equals Windows_NT
+      - Agent.OS -equals Windows_NT
+    workspace:
+      clean: all
+    steps:
+    - task: VSBuild@1
+      displayName: 'Build DACPAC'
+      inputs:
+        solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
+        platform: 'anycpu'
+        configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+
+    - task: CopyFiles@1
+      displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
+      inputs:
+        Contents: |
+          src\**\*.dacpac
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac
+  - job: 'BuildAndTest'
+    pool:
+      name: 'DAS - Continuous Integration Agents'
+      demands:
+        - Agent.OS -equals Linux
+      dependsOn: 'BuildDacpac'
     workspace:
       clean: all
     steps:
@@ -79,36 +118,49 @@ stages:
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: VSBuild@1
-      displayName: 'Build DACPAC'
-      inputs:
-        solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
-        platform: 'anycpu'
-        configuration: '$(buildConfiguration)'
-        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+    # - task: DownloadPipelineArtifact@2
+    #   displayName: 'Download DACPAC Artifact'
+    #   inputs:
+    #     artifactName: 'dacpac'
+    #     itemPattern: '**'
+    #     targetPath: $(dockerFileFolder)
 
-    - task: CmdLine@2
-      displayName: 'Install MsSqlLocalDb'
-      inputs:
-        script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
-        failOnStderr: true
+    # - task: AzureCLI@2
+    #   displayName: Build image using acr tasks
+    #   inputs:
+    #     azureSubscription: $(azureSubscription)
+    #     scriptType: bash
+    #     scriptLocation: inlineScript
+    #     inlineScript: |
+    #       az acr build \
+    #       --image '$(containerRegistry)/$(imageRepository):$(Build.BuildId)' \
+    #       --registry $(containerRegistry) \
+    #       --file $(dockerfilePath) \
+    #       $(Build.SourcesDirectory)
+          
+    ##TO DO: move to separate stage, this approach is not compatible with DAS Linux agents
+    # - task: CmdLine@2
+    #   displayName: 'Install MsSqlLocalDb'
+    #   inputs:
+    #     script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
+    #     failOnStderr: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Build Acceptance Tests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Build Acceptance Tests
+    #   inputs:
+    #     command: 'build'
+    #     projects: |
+    #       src/**/*.AcceptanceTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DotNetCoreCLI@2
-      displayName: Run Acceptance Tests
-      inputs:
-        command: test
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-          !src/**/*.PaymentsProcess.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Run Acceptance Tests
+    #   inputs:
+    #     command: test
+    #     projects: |
+    #       src/**/*.AcceptanceTests.csproj
+    #       !src/**/*.PaymentsProcess.AcceptanceTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
     - task: DotNetCoreCLI@2
       displayName: Build $(SolutionBaseName).Messages
@@ -135,7 +187,6 @@ stages:
           if ("$(GitVersion.PreReleaseLabel)" -ne "") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
           Write-Host "NuGetPackageVersion: $NuGetPackageVersion"
           Write-Host "##vso[task.setvariable variable=NuGetPackageVersion]$NuGetPackageVersion"
-
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
@@ -145,19 +196,6 @@ stages:
         versionEnvVar: NuGetPackageVersion
         packDirectory: $(build.artifactstagingdirectory)/NugetPackages
 
-    - task: CopyFiles@2
-      displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
-      inputs:
-        Contents: |
-          src\**\*.dacpac
-        TargetFolder: '$(build.artifactstagingdirectory)/publish'
-
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Artifact: dacpac'
-      inputs:
-        targetPath: $(build.artifactstagingdirectory)/publish
-        artifactName: dacpac
-
     - task: DotNetCoreCLI@2
       displayName: 'Publish - dotnet publish application $(SolutionBaseName).API'
       inputs:
@@ -165,7 +203,7 @@ stages:
         projects: 'src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
-        
+
     - task: DotNetCoreCLI@2
       displayName: 'Publish - dotnet publish application $(SolutionBaseName).Functions.DomainMessageHandlers'
       inputs:
@@ -195,13 +233,12 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)/NugetPackages
         artifactName: NugetPackages
- 
+
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifact: drop'
       inputs:
         targetPath: $(build.artifactstagingdirectory)/publish
         artifactName: drop
-
 
 - stage: NugetPublish
   displayName: 'Publish Nuget Package'

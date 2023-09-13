@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
@@ -13,7 +16,6 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
         private readonly OrchestrationData _orchestrationData;
+
         private bool isDisposed;
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
@@ -35,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public ObjectResult HttpObjectResult => ResponseObject as ObjectResult;
         public object ResponseObject { get; private set; }
 
+        [Obsolete]
         public TestFunction(TestContext testContext, string hubName)
         {
             HubName = hubName;
@@ -45,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                    { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
+                    { "FUNCTIONS_WORKER_RUNTIME", "dotnet" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
@@ -56,17 +60,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _testContext = testContext;
 
-            _host = new HostBuilder()
+            _host = new HostBuilder()                
                 .ConfigureAppConfiguration(a =>
                     {
                         a.Sources.Clear();
                         a.AddInMemoryCollection(_appConfig);
                     })
-                .ConfigureWebJobs(builder => builder
+                
+                .ConfigureWebJobs(builder => builder                       
                        .AddHttp(options => options.SetResponse = (request, o) =>
                        {
-                           ResponseObject = o;
-                       })
+                           ResponseObject = o;                           
+                       })                       
                        .AddDurableTask(options =>
                        {
                            options.HubName = HubName;
@@ -75,15 +80,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.ExtendedSessionsEnabled = false;
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
                            options.StorageProvider["partitionCount"] = 1;
-                           options.NotificationUrl = new Uri("localhost:7071");
 #pragma warning disable S125 // Sections of code should not be commented out
+                           options.Notifications = new NotificationOptions();
+                           options.AppLeaseOptions = new DurableTask.AzureStorage.Partitioning.AppLeaseOptions();
+                           options.HttpSettings = new HttpOptions();
+                           options.Tracing = new TraceOptions()
+                           {
+                               TraceInputsAndOutputs = true
+                            };
+
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
                            //options.HttpSettings.DefaultAsyncRequestSleepTimeMilliseconds = 500;
                            //options.MaxConcurrentActivityFunctions = 10;
                            //options.MaxConcurrentOrchestratorFunctions = 5;
 #pragma warning restore S125
                        })
-                       .AddAzureStorageCoreServices()
+                       .AddAzureStorageCoreServices()                       
                        .ConfigureServices(s =>
                        {
                            new Startup().Configure(builder);
@@ -91,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Configure<MatchedLearnerApi>(l =>
                            {
                                l.ApiBaseUrl = _testContext.LearnerMatchApi.BaseAddress;
-                               l.Identifier = "";
+                               l.IdentifierUri = "";
                                l.Version = "1.0";
                            });
 
@@ -120,40 +132,45 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.UseLearningEndpointStorageDirectory = _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory;
                                a.MinimumAgreementVersion = _testContext.ApplicationSettings.MinimumAgreementVersion;
                                a.ApiBaseUrl = _testContext.ApplicationSettings.ApiBaseUrl;
-                               a.Identifier = _testContext.ApplicationSettings.Identifier;
+                               a.IdentifierUri = _testContext.ApplicationSettings.IdentifierUri;
                                a.EmployerIncentivesWebBaseUrl = _testContext.ApplicationSettings.EmployerIncentivesWebBaseUrl;
                                a.LogLevel = _testContext.ApplicationSettings.LogLevel;
                                a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;
                                a.LearnerServiceCacheIntervalInMinutes = _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes;
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
-                               a.ReportsContainerName = testContext.InstanceId;
+                               a.ReportsContainerName = $"{TestContext.TestPrefix}{testContext.InstanceId}".ToLower();
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
                            s.AddSingleton(typeof(IDateTimeService), _testContext.DateTimeService);
-                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
+                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
+#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0612 // Type or member is obsolete
+                           s.AddScoped<IWebHookProvider>((s) => new TestWebHookProvider(_testContext));
+#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
+
                        })
                        )
-                    .ConfigureServices(s =>
-                    {
-                        s.AddHostedService<PurgeBackgroundJob>();
-                    })
+                    //.ConfigureServices(s =>
+                    //{
+                    //    s.AddHostedService<PurgeBackgroundJob>();
+                    //})
                 .Build();
         }
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 10);
+            var timeout = new TimeSpan(0, 0, 30);
             var delayTask = Task.Delay(timeout);
-            await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
+            await Task.WhenAny(_host.StartAsync(), delayTask);
 
             if (delayTask.IsCompleted)
             {
                 throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
             }
         }
-
         public Task Start(OrchestrationStarterInfo starter, bool throwIfFailed = true)
         {
             return Jobs.Start(starter, throwIfFailed);
@@ -181,6 +198,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task DisposeAsync()
         {
             await Jobs.StopAsync();
+
+            var endPoints = _host.Services.GetServices<IEndpointInstance>();
+            foreach (var endPoint in endPoints)
+            {
+                await endPoint.Stop();
+            }
+
             Dispose();
         }
 
@@ -200,6 +224,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
 
             isDisposed = true;
+        }
+    }
+
+
+    [Obsolete]
+    public class TestWebHookProvider : IWebHookProvider
+    {
+        private readonly TestContext _context;
+
+        public TestWebHookProvider(TestContext context)
+        {
+            _context = context;
+        }
+        public Uri GetUrl(IExtensionConfigProvider extension)
+        {
+            return new Uri($"http://localhost:7071");            
         }
     }
 }

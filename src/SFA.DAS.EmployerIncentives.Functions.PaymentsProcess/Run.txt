@@ -1,0 +1,2 @@
+@ECHO
+func host start --dotnet-isolated-debug --verbose

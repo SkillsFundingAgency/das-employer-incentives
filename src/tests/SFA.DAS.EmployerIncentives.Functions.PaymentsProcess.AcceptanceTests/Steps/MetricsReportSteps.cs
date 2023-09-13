@@ -43,10 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                    nameof(IncentivePaymentOrchestrator),
                    new Dictionary<string, object>
                    {
-                       ["req"] = new DummyHttpRequest
-                       {
-                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
-                       }
+                       ["req"] = TestContext.TestRequest($"/api/orchestrators/IncentivePaymentOrchestrator")
                    },
                    expectedCustomStatus: "WaitingForPaymentApproval"
                    ));

@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
         }
 
         [Test]
-        public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
+        public Task Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
             var command = _fixture.Create<EmployerWithdrawalCommand>();
@@ -104,8 +104,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should()
-                .Throw<WithdrawalException>()
+            return action.Should()
+                .ThrowAsync<WithdrawalException>()
                 .WithMessage("Unable to handle Employer withdrawal command.*");           
         }
     }

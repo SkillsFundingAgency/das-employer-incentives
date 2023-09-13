@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_a_ValidatePendingPaymentException()
+        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_a_ValidatePendingPaymentException()
         {
             // Arrange
             var failedValidation = _pendingPayments.First();
@@ -109,13 +109,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             //Assert
-            action.Should()
-                .Throw<AggregateException>()
+            return action.Should()
+                .ThrowAsync<AggregateException>()
                 .WithMessage($"Error ValidatePendingPayments (failed to validate ApprenticeshipIncentiveId : {failedValidation.ApprenticeshipIncentiveId}, PendingPaymentId : {failedValidation.PendingPaymentId}, Message : {exceptionMessage} )");
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_an_exception_other_than_a_ValidatePendingPaymentException()
+        public Task Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_an_exception_other_than_a_ValidatePendingPaymentException()
         {
             // Arrange
             var failedValidation = _pendingPayments.First();
@@ -135,8 +135,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             //Assert
-            action.Should()
-                .Throw<Exception>()
+            return action.Should()
+                .ThrowAsync<Exception>()
                 .WithMessage(exceptionMessage);
         }
     }

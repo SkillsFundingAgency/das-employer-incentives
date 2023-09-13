@@ -28,5 +28,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             _context.PaymentsApi.Reset();
         }
+
+        [AfterFeature()]
+        public static void CleanUpPaymentsApi(FeatureInfo featureInfo)
+        {
+            var paymentsApi = FeatureTestContext.FeatureData.Get<MockApi>(featureInfo.Title + nameof(PaymentsApi));
+            if (paymentsApi != null)
+            {
+                paymentsApi.Dispose();
+            }
+        }
     }
 }

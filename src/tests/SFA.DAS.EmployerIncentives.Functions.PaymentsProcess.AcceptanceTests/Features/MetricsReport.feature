@@ -1,5 +1,4 @@
 ﻿@activeCalendarPeriod
-@azureBlobStorage
 Feature: MetricsReport
 	In order to make approve payments once they have been validated
 	As a employer incentives service

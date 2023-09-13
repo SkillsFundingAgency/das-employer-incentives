@@ -1,5 +1,4 @@
-﻿using System;
-using Dapper.Contrib.Extensions;
+﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
@@ -129,10 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/IncentivePaymentOrchestrator")
                     },
                     expectedCustomStatus: "WaitingForPaymentApproval"
                 ));
@@ -150,10 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"
-                        },
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"),
                         ["instanceId"] = _orchestratorInstanceId
                     }
                 ));

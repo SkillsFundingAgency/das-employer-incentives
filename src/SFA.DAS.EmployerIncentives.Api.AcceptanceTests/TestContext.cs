@@ -1,11 +1,12 @@
 ﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.TestHelpers.Types;
+using SFA.DAS.HashingService;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -13,10 +14,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class TestContext
     {
         public string InstanceId { get; private set; }
+        public string SqlDataSource { get; private set; }
+        public string TestName { get; private set; }
         public CancellationToken CancellationToken { get; set; }
         public DirectoryInfo TestDirectory { get; set; }
         public TestDateTimeService DateTimeService { get; set; }
-        public SqlDatabase SqlDatabase { get; set; }
+        public ISqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestEmploymentCheckApi EmploymentCheckApi { get; set; }
@@ -37,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public TestContext()
         {
             InstanceId = Guid.NewGuid().ToString();
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName, $"TestDirectory\\{InstanceId}"));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);
@@ -51,6 +54,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             PublishedEvents = new List<PublishedEvent>();
             CommandsPublished = new List<PublishedCommand>();
             DateTimeService = new TestDateTimeService();
+        }
+
+        public void Initialise(SqlServerImageInfo sqlServerImageInfo, string testName)
+        {
+            SqlDataSource = sqlServerImageInfo.DataSource;
+            TestName = testName;
         }
     }
 }

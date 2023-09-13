@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 {
+    [ExcludeFromCodeCoverage]
     internal static class DurableOrchestrationClientExtensions
     {
         public static async Task Wait(this IDurableOrchestrationClient client,
@@ -24,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
                     break;
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(100), token);
+                await Task.Delay(TimeSpan.FromMilliseconds(200), token);
             }
         }
     }

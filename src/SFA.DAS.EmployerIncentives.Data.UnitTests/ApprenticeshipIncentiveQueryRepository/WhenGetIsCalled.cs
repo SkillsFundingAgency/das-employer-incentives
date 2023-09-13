@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
 
             // Assert
             var actual = await _sut.GetList(x => x.CourseName.StartsWith("TEST "));
-            actual.Should().BeEquivalentTo(apprenticeshipIncentives[0]);
+            actual.Should().BeEquivalentTo(new System.Collections.Generic.List<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>() { apprenticeshipIncentives[0] });
         }
 
         [Test]

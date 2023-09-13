@@ -1,30 +1,41 @@
 ﻿using Azure.Storage.Blobs;
 using Dapper.Contrib.Extensions;
+using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
+using SqlDatabase = SFA.DAS.EmployerIncentives.TestHelpers.Services.SqlDatabase;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
     public class TestContext : IDisposable
     {
+        public const string TestPrefix = "EITEST";
+
         public string InstanceId { get; private set; }
+
+        public string SqlDataSource { get; private set; }
+
         public DirectoryInfo TestDirectory { get; set; }
         public TestFunction TestFunction { get; set; }
         public TestDateTimeService DateTimeService { get; set; }
 
         public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
-        public SqlDatabase SqlDatabase { get; set; }
+        public ISqlDatabase SqlDatabase { get; set; }
         public ApplicationSettings ApplicationSettings { get; set; }        
 
         public MockApi LearnerMatchApi { get; set; }
@@ -35,9 +46,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
+        public static HttpRequest TestRequest(string path, object body = null) => CreateTestRequest(path, body);
+
         public TestContext()
         {
-            InstanceId = Guid.NewGuid().ToString();
+            InstanceId = Guid.NewGuid().ToString().Replace("-", "");
             TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
             if (!TestDirectory.Exists)
             {
@@ -53,6 +66,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
                 UseLearningEndpointStorageDirectory = Path.Combine(TestDirectory.FullName, ".learningtransport"),
             };
         }
+        public void Initialise(SqlServerImageInfo sqlServerImageInfo)
+        {
+            SqlDataSource = sqlServerImageInfo.DataSource;
+        }
 
         private bool _isDisposed;
 
@@ -60,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
+        }        
 
         public async Task SetActiveCollectionCalendarPeriod(CollectionPeriod collectionPeriod)
         {
@@ -108,6 +125,36 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
 
             _isDisposed = true;
+        }
+
+        private static HttpRequest CreateTestRequest(string path, object body = null)
+        {
+            if (!path.StartsWith("/"))
+            {
+                path = string.Concat("/", path);
+            }
+
+            var json = body == null ? "{}" : JsonSerializer.Serialize(body);
+
+            var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
+
+            var context = new DefaultHttpContext();
+            var request = context.Request;
+            request.Body = memoryStream;
+            request.ContentType = "application/json";
+            request.Method = HttpMethod.Get.ToString();
+            request.Scheme = "https";
+            request.Host = new HostString("localhost:7071");
+            request.IsHttps = false;
+            request.Query = new QueryCollection();
+            request.Path = path;
+            request.QueryString = QueryString.Empty;
+            request.Protocol = string.Empty;
+            request.ContentLength = request.Body.Length;
+            request.Form = new FormCollection(new Dictionary<string, StringValues>());
+
+
+            return request;
         }
     }
 }

@@ -31,13 +31,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new ValidationOverrideCommandHandler(_mockDomainRepository.Object);
         }
         [Test]
-        public async Task Then_the_KeyNotFoundException_is_thrown_when_no_incentive_is_found_for_this_uln_and_accountlegalentityid()
+        public Task Then_the_KeyNotFoundException_is_thrown_when_no_incentive_is_found_for_this_uln_and_accountlegalentityid()
         {
             var command = _fixture.Create<ValidationOverrideCommand>();
 
             Func<Task> act = async () => await _sut.Handle(command);
 
-            act.Should().Throw<KeyNotFoundException>();
+            return act.Should().ThrowAsync<KeyNotFoundException>();
         }
         [Test]
         public async Task Then_the_ValidationOverride_flag_for_this_incentive_is_set_on()

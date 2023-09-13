@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.QueryHandlerWithLogging
         }
 
         [Test]
-        public void Then_a_handler_exception_is_propogated()
+        public Task Then_a_handler_exception_is_propogated()
         {
             // Arrange
             var query = new TestQuery();
@@ -104,7 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.QueryHandlerWithLogging
             Func<Task> action = async () => await _sut.Handle(query);
 
             // Assert
-            action.Should().Throw<Exception>().WithMessage(errorMessage);
+            return action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
         }
     }
 }
