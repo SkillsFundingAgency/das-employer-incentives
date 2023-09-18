@@ -935,9 +935,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void ReinstatePendingPayment(PendingPaymentModel pendingPaymentModel, ReinstatePaymentRequest reinstatePaymentRequest)
         {
-            pendingPaymentModel.ClawedBack = false;
-            pendingPaymentModel.PaymentMadeDate = null;
-            pendingPaymentModel.CalculatedDate = DateTime.UtcNow;
+
+            var payment = Model.PaymentModels.FirstOrDefault(x => x.PendingPaymentId == pendingPaymentModel.Id);
+            if (payment != null)
+            {
+                if (payment.PaidDate.HasValue)
+                {
+                    pendingPaymentModel.PaymentMadeDate = payment.PaidDate.Value.Date;
+                }
+
+                pendingPaymentModel.CollectionPeriod = new CollectionPeriod(payment.PaymentPeriod, payment.PaymentYear);
+            }
+            else
+            {
+                pendingPaymentModel.ClawedBack = false;
+                pendingPaymentModel.PaymentMadeDate = null;
+                pendingPaymentModel.CalculatedDate = DateTime.UtcNow;
+            }
+
 
             Model.PendingPaymentModels.Add(pendingPaymentModel);
 

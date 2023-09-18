@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
 using Dapper.Contrib.Extensions;
@@ -24,6 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly string _connectionString;
         private ApprenticeshipIncentive _apprenticeshipIncentive;
         private Data.ApprenticeshipIncentives.Models.Archive.PendingPayment _archivedPendingPayment;
+        private PendingPayment _existingPendingPayment;
+        private Payment _existingPayment;
         private HttpResponseMessage _response;
         private ReinstatePaymentsRequest _reinstatePaymentsRequest;
 
@@ -43,9 +44,40 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.PaymentMadeDate, _fixture.Create<DateTime>())
                 .Create();
 
-            using var dbConnection = new SqlConnection(_connectionString);
+            await using var dbConnection = new SqlConnection(_connectionString);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_archivedPendingPayment);
+        }
+
+        [Given("the pending payment has already been paid")]
+        public async Task GivenThePendingPaymentHasAlreadyBeenPaid()
+        {
+            _existingPayment = _fixture.Build<Payment>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _archivedPendingPayment.PendingPaymentId)
+                .With(x => x.Amount, _archivedPendingPayment.Amount)
+                .With(x => x.AccountId, _archivedPendingPayment.AccountId)
+                .With(x => x.AccountLegalEntityId, _archivedPendingPayment.AccountLegalEntityId)
+                .With(x => x.PaymentPeriod, 2)
+                .With(x => x.PaymentYear, 2223)
+                .With(x => x.PaidDate, new DateTime(2022, 09, 06))
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_existingPayment);
+        }
+
+        [Given("the pending payment already exists")]
+        public async Task GivenThePendingPaymentAlreadyExists()
+        {
+            _existingPendingPayment = _fixture.Build<PendingPayment>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.Id, _archivedPendingPayment.PendingPaymentId)
+                .With(x => x.PaymentMadeDate, new DateTime(2022, 01, 08))
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_existingPendingPayment);
         }
 
         [When(@"a reinstate request is received")]
@@ -81,6 +113,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             reinstatedPendingPayment.Should().NotBeNull();
             reinstatedPendingPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             reinstatedPendingPayment.PaymentMadeDate.Should().BeNull();
+        }
+
+        [Then(@"the pending payment is restored using the payment details")]
+        public async Task ThenThePendingPaymentIsRestoredUsingThePaymentDetails()
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            var pendingPayments = dbConnection.GetAll<PendingPayment>();
+            var restoredPendingPayment = pendingPayments.FirstOrDefault(x => x.Id == _archivedPendingPayment.PendingPaymentId);
+            restoredPendingPayment.PaymentMadeDate.Should().Be(_existingPayment.PaidDate.Value.Date);
+            restoredPendingPayment.PeriodNumber.Should().Be(_existingPayment.PaymentPeriod);
+            restoredPendingPayment.PaymentYear.Should().Be(_existingPayment.PaymentYear);
+            restoredPendingPayment.Amount.Should().Be(_existingPayment.Amount);
+        }
+
+        [Then(@"the pending payment is not reinstated")]
+        public async Task ThenThePendingPaymentIsNotReinstated()
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            var pendingPayments = dbConnection.GetAll<PendingPayment>();
+            var unmodifiedPendingPayment = pendingPayments.FirstOrDefault(x => x.Id == _archivedPendingPayment.PendingPaymentId);
+            unmodifiedPendingPayment.PaymentMadeDate.Value.Date.Should().Be(_existingPendingPayment.PaymentMadeDate.Value.Date);
+            unmodifiedPendingPayment.PeriodNumber.Should().Be(_existingPendingPayment.PeriodNumber);
+            unmodifiedPendingPayment.PaymentYear.Should().Be(_existingPendingPayment.PaymentYear);
         }
 
         [Then(@"a log is written for the reinstate action")]
