@@ -157,7 +157,7 @@ testRunner.Given("a pending payment has been archived for an apprenticeship ince
 testRunner.When("a reinstate request is received for a pending payment id that does not match", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 17
-testRunner.Then("an error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.Then("a pending payment not found error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -207,14 +207,12 @@ testRunner.Then("the pending payment is restored using the payment details", ((s
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When the pending payment already exists then the pending payment is not reinstate" +
-            "d")]
-        public virtual void WhenThePendingPaymentAlreadyExistsThenThePendingPaymentIsNotReinstated()
+        [NUnit.Framework.DescriptionAttribute("When the pending payment already exists then an error is returned")]
+        public virtual void WhenThePendingPaymentAlreadyExistsThenAnErrorIsReturned()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When the pending payment already exists then the pending payment is not reinstate" +
-                    "d", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When the pending payment already exists then an error is returned", null, tagsOfScenario, argumentsOfScenario);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -245,7 +243,7 @@ testRunner.And("the pending payment already exists", ((string)(null)), ((TechTal
 testRunner.When("a reinstate request is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 29
-testRunner.Then("the pending payment is not reinstated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.Then("a pending payment already exists error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

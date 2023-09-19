@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using TechTalk.SpecFlow;
@@ -149,10 +150,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             reinstatedPendingPaymentAudits[0].PendingPaymentId.Should().Be(_archivedPendingPayment.PendingPaymentId);
         }
 
-        [Then(@"an error is returned")]
-        public void ThenAnErrorIsReturned()
+        [Then(@"a pending payment not found error is returned")]
+        public async Task ThenAPendingPaymentNotFoundErrorIsReturned()
         {
             _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var content = await _response.Content.ReadAsStringAsync();
+            var message = JsonConvert.SerializeObject(content);
+            message.Should().Contain(_reinstatePaymentsRequest.Payments[0].ToString());
+            message.Should().Contain("not found");
+        }
+
+        [Then(@"a pending payment already exists error is returned")]
+        public async Task ThenAPendingPaymentAlreadyExistsErrorIsReturned()
+        {
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var content = await _response.Content.ReadAsStringAsync();
+            var message = JsonConvert.SerializeObject(content);
+            message.Should().Contain(_archivedPendingPayment.PendingPaymentId.ToString());
+            message.Should().Contain("already exists");
         }
     }
 
