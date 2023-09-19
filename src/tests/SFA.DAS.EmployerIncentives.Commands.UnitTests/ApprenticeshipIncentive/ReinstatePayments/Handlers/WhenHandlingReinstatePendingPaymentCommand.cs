@@ -99,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_an_exception_is_thrown_if_the_pending_payment_already_exists()
+        public void Then_an_exception_is_thrown_if_the_pending_payment_already_exists()
         {
             // Arrange
             var archivedPendingPayment = _fixture.Create<PendingPaymentModel>();
