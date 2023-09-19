@@ -945,6 +945,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
 
                 pendingPaymentModel.CollectionPeriod = new CollectionPeriod(payment.PaymentPeriod, payment.PaymentYear);
+                pendingPaymentModel.Amount = payment.Amount;
             }
             else
             {

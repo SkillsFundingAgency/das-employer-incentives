@@ -160,7 +160,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var archivedPendingPayment = _fixture.Create<PendingPaymentModel>();
             var existingPayment = _fixture.Build<PaymentModel>()
                 .With(x => x.PendingPaymentId, archivedPendingPayment.Id)
-                .With(x => x.Amount, archivedPendingPayment.Amount)
+                .With(x => x.Amount, 1000m)
                 .With(x => x.ApprenticeshipIncentiveId, archivedPendingPayment.ApprenticeshipIncentiveId)
                 .With(x => x.Account, new Account(archivedPendingPayment.Account.Id, archivedPendingPayment.Account.AccountLegalEntityId))
                 .Create();
@@ -202,13 +202,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var firstPayment = _fixture.Build<PaymentModel>()
                 .With(x => x.PendingPaymentId, Guid.NewGuid)
-                .With(x => x.Amount, archivedPendingPayment.Amount)
+                .With(x => x.Amount, 1500m)
                 .With(x => x.ApprenticeshipIncentiveId, archivedPendingPayment.ApprenticeshipIncentiveId)
                 .With(x => x.Account, new Account(archivedPendingPayment.Account.Id, archivedPendingPayment.Account.AccountLegalEntityId))
                 .Create();
             var secondPayment = _fixture.Build<PaymentModel>()
                 .With(x => x.PendingPaymentId, archivedPendingPayment.Id)
-                .With(x => x.Amount, archivedPendingPayment.Amount)
+                .With(x => x.Amount, 1500m)
                 .With(x => x.ApprenticeshipIncentiveId, archivedPendingPayment.ApprenticeshipIncentiveId)
                 .With(x => x.Account, new Account(archivedPendingPayment.Account.Id, archivedPendingPayment.Account.AccountLegalEntityId))
                 .Create();
