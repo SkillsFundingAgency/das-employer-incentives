@@ -128,17 +128,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             restoredPendingPayment.Amount.Should().Be(_existingPayment.Amount);
         }
 
-        [Then(@"the pending payment is not reinstated")]
-        public async Task ThenThePendingPaymentIsNotReinstated()
-        {
-            await using var dbConnection = new SqlConnection(_connectionString);
-            var pendingPayments = dbConnection.GetAll<PendingPayment>();
-            var unmodifiedPendingPayment = pendingPayments.FirstOrDefault(x => x.Id == _archivedPendingPayment.PendingPaymentId);
-            unmodifiedPendingPayment.PaymentMadeDate.Value.Date.Should().Be(_existingPendingPayment.PaymentMadeDate.Value.Date);
-            unmodifiedPendingPayment.PeriodNumber.Should().Be(_existingPendingPayment.PeriodNumber);
-            unmodifiedPendingPayment.PaymentYear.Should().Be(_existingPendingPayment.PaymentYear);
-        }
-
         [Then(@"a log is written for the reinstate action")]
         public async Task ThenALogIsWrittenForTheReinstateAction()
         {
