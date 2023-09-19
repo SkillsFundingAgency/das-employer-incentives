@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ReinstateP
 
             if (incentive.PendingPayments.Any(x => x.Id == pendingPayment.Id))
             {
-                return;
+                throw new ArgumentException($"Apprenticeship incentive with ID {pendingPayment.ApprenticeshipIncentiveId} pending payment ID {command.PendingPaymentId} already exists");
             }
 
             incentive.ReinstatePendingPayment(pendingPayment, command.ReinstatePaymentRequest);

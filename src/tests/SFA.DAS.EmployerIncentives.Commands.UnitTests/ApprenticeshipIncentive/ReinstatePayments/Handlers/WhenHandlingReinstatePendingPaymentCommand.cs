@@ -99,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_pending_payment_is_not_reinstated_if_it_already_exists()
+        public async Task Then_an_exception_is_thrown_if_the_pending_payment_already_exists()
         {
             // Arrange
             var archivedPendingPayment = _fixture.Create<PendingPaymentModel>();
@@ -116,10 +116,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new ReinstatePendingPaymentCommand(archivedPendingPayment.Id, _fixture.Create<ReinstatePaymentRequest>());
 
             // Act
-            await _sut.Handle(command);
+            Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            _domainRepository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+            action.Should().Throw<ArgumentException>().WithMessage($"Apprenticeship incentive with ID {archivedPendingPayment.ApprenticeshipIncentiveId} pending payment ID {archivedPendingPayment.Id} already exists");
         }
 
         [Test]
