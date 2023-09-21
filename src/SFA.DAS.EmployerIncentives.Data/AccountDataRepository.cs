@@ -104,15 +104,19 @@ namespace SFA.DAS.EmployerIncentives.Data
             var accounts = new List<Models.Account>();
 
             var accountsForVendorId = await _dbContext.Accounts.Where(x => x.VrfVendorId == vendorId).ToArrayAsync();
+            
             if (accountsForVendorId.Any())
             {
-                var accountId = accountsForVendorId.FirstOrDefault().Id;
-                var otherAccountLegalEntities = await _dbContext.Accounts.Where(x => x.Id == accountId && x.VrfVendorId != vendorId).ToArrayAsync();
-
                 accounts.AddRange(accountsForVendorId);
-                if (otherAccountLegalEntities.Any())
+
+                foreach (var matchedAccount in accountsForVendorId)
                 {
-                    accounts.AddRange(otherAccountLegalEntities);
+                    var otherAccountLegalEntities = await _dbContext.Accounts.Where(x => x.Id == matchedAccount.Id && x.VrfVendorId != vendorId).ToArrayAsync();
+
+                    if (otherAccountLegalEntities.Any())
+                    {
+                        accounts.AddRange(otherAccountLegalEntities);
+                    }
                 }
             }
 
