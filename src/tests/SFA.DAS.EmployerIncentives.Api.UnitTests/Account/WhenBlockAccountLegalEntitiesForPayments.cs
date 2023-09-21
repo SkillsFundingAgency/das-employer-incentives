@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -37,9 +38,14 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             var request = _fixture.Build<BlockAccountLegalEntityForPaymentsRequest>()
                 .With(x => x.VendorBlocks, _fixture.CreateMany<VendorBlock>(10).ToList())
                 .Create();
-            
+
+            var requestList = new List<BlockAccountLegalEntityForPaymentsRequest>
+            {
+                request
+            };
+
             // Act
-            await _sut.BlockAccountLegalEntityForPayments(request);
+            await _sut.BlockAccountLegalEntityForPayments(requestList);
 
             // Assert
             foreach(var vendorBlock in request.VendorBlocks)

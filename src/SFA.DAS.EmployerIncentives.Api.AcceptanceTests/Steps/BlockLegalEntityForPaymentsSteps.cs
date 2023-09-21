@@ -17,21 +17,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly Fixture _fixture;
         private long _accountId1;
-        private long _accountLegalEntityId1;
         private long _accountId2;
+        private long _accountLegalEntityId1;
         private long _accountLegalEntityId2;
         private long _accountLegalEntityId3;
+        private List<BlockAccountLegalEntityForPaymentsRequest> _blockRequest;
+        private DateTime _vendorBlockEndDate1;
+        private DateTime _vendorBlockEndDate2;
         private string _vendorId1;
         private string _vendorId2;
         private string _vendorId3;
-        private DateTime _vendorBlockEndDate1;
-        private DateTime _vendorBlockEndDate2;
-        private BlockAccountLegalEntityForPaymentsRequest _blockRequest;
 
-        public BlockLegalEntityForPaymentsSteps(TestContext testContext) : base(testContext)
-        {
-            _fixture = new Fixture();
-        }
+        public BlockLegalEntityForPaymentsSteps(TestContext testContext) : base(testContext) => _fixture = new Fixture();
 
         [Given(@"there are accounts in employment incentives that have been validated to receive payments")]
         public async Task GivenThereAreAccountsValidatedToReceivePayments()
@@ -50,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.VrfVendorId, _vendorId1)
                 .Without(x => x.VendorBlockEndDate)
                 .Create();
+
             var account2 = _fixture.Build<Account>()
                 .With(x => x.Id, _accountId2)
                 .With(x => x.AccountLegalEntityId, _accountLegalEntityId2)
@@ -68,15 +66,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _vendorBlockEndDate2 = DateTime.Now.AddDays(50);
 
             var url = "/blockedpayments";
-            _blockRequest = new BlockAccountLegalEntityForPaymentsRequest
+            _blockRequest = new List<BlockAccountLegalEntityForPaymentsRequest>
             {
-                ServiceRequest = _fixture.Create<ServiceRequest>(),
-                VendorBlocks = new List<VendorBlock>
+                new BlockAccountLegalEntityForPaymentsRequest
                 {
-                    new VendorBlock { VendorId = _vendorId1, VendorBlockEndDate = _vendorBlockEndDate1 },
-                    new VendorBlock { VendorId = _vendorId2, VendorBlockEndDate = _vendorBlockEndDate2 }
+                    ServiceRequest = _fixture.Create<ServiceRequest>(),
+                    VendorBlocks = new List<VendorBlock>
+                    {
+                        new VendorBlock
+                        {
+                            VendorId = _vendorId1,
+                            VendorBlockEndDate = _vendorBlockEndDate1
+                        },
+                        new VendorBlock
+                        {
+                            VendorId = _vendorId2,
+                            VendorBlockEndDate = _vendorBlockEndDate2
+                        }
+                    }
                 }
             };
+
+
             var apiResult = await EmployerIncentiveApi.Client.PatchAsync(url, _blockRequest.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -110,12 +121,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.VrfVendorId, _vendorId1)
                 .Without(x => x.VendorBlockEndDate)
                 .Create();
+
             var account2 = _fixture.Build<Account>()
                 .With(x => x.Id, _accountId1)
                 .With(x => x.AccountLegalEntityId, _accountLegalEntityId2)
                 .With(x => x.VrfVendorId, _vendorId2)
                 .Without(x => x.VendorBlockEndDate)
                 .Create();
+
             var account3 = _fixture.Build<Account>()
                 .With(x => x.Id, _accountId1)
                 .With(x => x.AccountLegalEntityId, _accountLegalEntityId3)
@@ -132,16 +145,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenARequestToBlockOneOfTheAccountLegalEntitiesIsReceived()
         {
             _vendorBlockEndDate1 = DateTime.Now.AddDays(28);
-            
+
             var url = "/blockedpayments";
-            _blockRequest = new BlockAccountLegalEntityForPaymentsRequest
+            _blockRequest = new List<BlockAccountLegalEntityForPaymentsRequest>
             {
-                ServiceRequest = _fixture.Create<ServiceRequest>(),
-                VendorBlocks = new List<VendorBlock>
+                new BlockAccountLegalEntityForPaymentsRequest
                 {
-                    new VendorBlock { VendorId = _vendorId2, VendorBlockEndDate = _vendorBlockEndDate1 }
+                    ServiceRequest = _fixture.Create<ServiceRequest>(),
+                    VendorBlocks = new List<VendorBlock>
+                    {
+                        new VendorBlock
+                        {
+                            VendorId = _vendorId2,
+                            VendorBlockEndDate = _vendorBlockEndDate1
+                        }
+                    }
                 }
             };
+
             var apiResult = await EmployerIncentiveApi.Client.PatchAsync(url, _blockRequest.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -155,6 +176,5 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var updatedAccount = accounts.FirstOrDefault(x => x.AccountLegalEntityId == _accountLegalEntityId2);
             updatedAccount.VendorBlockEndDate.Should().Be(_vendorBlockEndDate1);
         }
-
     }
 }
