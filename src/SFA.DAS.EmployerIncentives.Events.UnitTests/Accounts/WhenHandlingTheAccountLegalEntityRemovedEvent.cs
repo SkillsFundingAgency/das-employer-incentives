@@ -5,11 +5,10 @@ using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
-using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Events.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
@@ -49,12 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
             await _sut.Handle(accountLegalEntityRemovedEvent);
 
             //Assert
-            _commandPublisher.Verify(x => x.Publish(It.IsAny<WithdrawCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(applications.Sum(x => x.ApprenticeshipModels.Count)));
+            _commandPublisher.Verify(x => x.Publish(It.IsAny<EmployerWithdrawalCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(applications.Sum(x => x.ApprenticeshipModels.Count)));
             foreach (var application in applications)
             {
                 foreach (var apprenticeship in application.ApprenticeshipModels)
                 {
-                    _commandPublisher.Verify(x => x.Publish(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id && y.WithdrawnBy == WithdrawnBy.Employer), It.IsAny<CancellationToken>()), Times.Once);
+                    _commandPublisher.Verify(x => x.Publish(It.Is<EmployerWithdrawalCommand>(y => y.ULN == apprenticeship.ULN), It.IsAny<CancellationToken>()), Times.Once);
                 }
             }
         }

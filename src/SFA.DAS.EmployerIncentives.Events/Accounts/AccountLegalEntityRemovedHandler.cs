@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -31,7 +33,14 @@ namespace SFA.DAS.EmployerIncentives.Events.Accounts
             {
                 foreach (var apprenticeship in application.ApprenticeshipModels)
                 {
-                    var withdrawCommand = new WithdrawCommand(application.AccountId, apprenticeship.Id, WithdrawnBy.Employer);
+                    var withdrawCommand = new EmployerWithdrawalCommand(
+                                              application.AccountLegalEntityId,
+                                              apprenticeship.ULN,
+                                              Guid.NewGuid().ToString(),
+                                              "RemovedLegalEntity",
+                                              DateTime.UtcNow,
+                                              application.AccountId,
+                                              string.Empty);
 
                     withdrawTasks.Add(_commandPublisher.Publish(withdrawCommand));
                 }
