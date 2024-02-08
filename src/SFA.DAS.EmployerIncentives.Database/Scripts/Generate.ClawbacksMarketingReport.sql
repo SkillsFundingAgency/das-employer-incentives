@@ -17,7 +17,8 @@ INSERT INTO @NewPaymentGenerated
 SELECT ai.ULN, EarningType as [Payment],
 CASE
 WHEN COUNT (EarningType) > 1 THEN 'Yes' 
-ELSE 'No'END as 'NewPaymentGenerated'
+ELSE 'No'
+END as 'NewPaymentGenerated'
 FROM [incentives].[ApprenticeshipIncentive] ai
 JOIN incentives.PendingPayment pp1 on ai.Id = pp1.ApprenticeshipIncentiveId
 GROUP BY ULN, EarningType
@@ -32,10 +33,6 @@ ia.SubmittedByName AS [Submitted by name],
 ai.ULN,
 ISNULL(dil.NumberOfDaysInLearning, 0) AS [Number of days in learning],
 ai.[Status] AS [EI Application status],
-CASE 
-	WHEN pp.ClawedBack = 1 THEN 'Yes'
-	ELSE 'Unknown'
-END as ClawedBack,
 CASE
 	WHEN ai.[Status] = 'Withdrawn' THEN 'Yes'
 	WHEN ai.[Status] <> 'Withdrawn' AND pp.EarningType = 'FirstPayment' AND NumberOfDaysInLearning < 90 THEN 'Yes'
