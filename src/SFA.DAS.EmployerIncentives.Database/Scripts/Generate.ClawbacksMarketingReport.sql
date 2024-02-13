@@ -3,7 +3,7 @@ DECLARE @EndDate DATETIME
 
 -- Adjust date ranges here
 SET @StartDate = '2021-01-01'
-SET @EndDate = '2024-02-01'
+SET @EndDate = '2024-02-29'
 -- Adjust date ranges here
 
 DECLARE @NewPaymentGenerated TABLE 
@@ -45,12 +45,23 @@ npg.NewPaymentGenerated AS [New Payment Generated],
 LOWER(REPLACE(cp.Id, '-', '')) AS [Payment Request ID],
 cp.Amount AS [Clawback amount],
 p.PaidDate AS [Payment made date],
-cp.DateClawbackSent AS [Clawback sent date]
+cp.DateClawbackSent AS [Clawback sent date],
+CASE
+	WHEN ec1.Result = 1  
+			THEN 'Failed Check 1'
+	WHEN ec2.Result = 0
+			THEN 'Failed Check 2'
+	WHEN ec3.Result = 0 
+			THEN 'Failed 365 Check 2'
+	WHEN ec1.Result IS NULL
+			THEN NULL
+			ELSE 'Pass'
+END as [EMV status]
 FROM
 incentives.ClawbackPayment cp
 INNER JOIN incentives.PendingPayment pp
 ON pp.Id = cp.PendingPaymentId
-LEFT outer JOIN dbo.Accounts a
+LEFT OUTER JOIN dbo.Accounts a
 ON a.AccountLegalEntityId = cp.AccountLegalEntityId
 INNER JOIN incentives.ApprenticeshipIncentive ai
 ON ai.Id = cp.ApprenticeshipIncentiveId
@@ -68,6 +79,15 @@ AND dil.CreatedDate =(SELECT MAX(CreatedDate) FROM incentives.ApprenticeshipDays
 INNER JOIN @NewPaymentGenerated npg
 ON npg.ULN = ai.ULN
 AND npg.EarningType = pp.EarningType
+LEFT OUTER JOIN incentives.EmploymentCheck ec1
+ON ec1.ApprenticeshipIncentiveId = ai.Id
+AND ec1.CheckType = 'EmployedBeforeSchemeStarted'
+LEFT OUTER JOIN incentives.EmploymentCheck ec2
+ON ec2.ApprenticeshipIncentiveId = ai.Id
+AND ec2.CheckType = 'EmployedAtStartOfApprenticeship'
+LEFT OUTER JOIN incentives.EmploymentCheck ec3
+ON ec3.ApprenticeshipIncentiveId = ai.Id
+AND ec3.CheckType = 'EmployedAt365PaymentDueDateSecondCheck'
 WHERE cp.DateClawbackSent >= @StartDate AND cp.DateClawbackSent <= @EndDate
 ORDER BY
 ISNULL(cp.VrfVendorId, a.VrfVendorId),
