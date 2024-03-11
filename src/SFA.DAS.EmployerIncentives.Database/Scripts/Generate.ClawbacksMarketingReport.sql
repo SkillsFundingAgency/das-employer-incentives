@@ -40,7 +40,7 @@ CASE
 	WHEN ai.[Status] <> 'Withdrawn' AND pp.EarningType = 'FirstPayment' AND NumberOfDaysInLearning >= 90 THEN 'No'
 	WHEN ai.[Status] <> 'Withdrawn' AND pp.EarningType = 'SecondPayment' AND NumberOfDaysInLearning >= 365 THEN 'No'
 	ELSE 'Unknown'
-END as [Clawback valid],
+END AS [Clawback valid],
 npg.NewPaymentGenerated AS [New Payment Generated],
 LOWER(REPLACE(cp.Id, '-', '')) AS [Payment Request ID],
 cp.Amount AS [Clawback amount],
@@ -56,7 +56,31 @@ CASE
 	WHEN ec1.Result IS NULL
 			THEN NULL
 			ELSE 'Pass'
-END as [EMV status]
+END AS [EMV status],
+'10233' AS [Cost centre],
+'EIAPP' AS [Funding code],
+CASE
+	WHEN cp.SubNominalCode = 0
+			THEN '100339'
+	WHEN cp.SubNominalCode = 1
+			THEN '100388'
+	WHEN cp.SubNominalCode = 2
+			THEN '100349'
+	WHEN cp.SubNominalCode = 3
+			THEN '100397'
+			ELSE 'Unknown'
+END AS [Activity Code],
+CASE
+	WHEN cp.SubNominalCode = 0
+			THEN '54156003'
+	WHEN cp.SubNominalCode = 1
+			THEN '54156002'
+	WHEN cp.SubNominalCode = 2
+			THEN '54156003'
+	WHEN cp.SubNominalCode = 3
+			THEN '54156002'
+			ELSE 'Unknown'
+END AS [GL Code]
 FROM
 incentives.ClawbackPayment cp
 INNER JOIN incentives.PendingPayment pp
