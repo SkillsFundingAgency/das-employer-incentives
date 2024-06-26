@@ -42,7 +42,7 @@ CASE
 	ELSE 'Unknown'
 END AS [Clawback valid],
 npg.NewPaymentGenerated AS [New Payment Generated],
-LOWER(REPLACE(cp.Id, '-', '')) AS [Payment Request ID],
+UPPER(REPLACE(cp.Id, '-', '')) AS [Payment Request ID],
 cp.Amount AS [Clawback amount],
 p.PaidDate AS [Payment made date],
 cp.DateClawbackSent AS [Clawback sent date],
