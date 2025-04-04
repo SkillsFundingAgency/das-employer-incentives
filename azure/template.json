@@ -135,6 +135,19 @@
         "utcValue": {
             "type": "string",
             "defaultValue": "[utcNow('yyMMddHHmmss')]"
+        },
+        "EnableRouteTableAssociation": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Determines whether to enable route table association on subnet"
+            }
+        },
+        "SharedRouteTableName": {
+            "type": "string",
+            "metadata": {
+                "description": "Determines whether to enable route table association on subnet"
+            }
         }
     },
     "variables": {
@@ -142,12 +155,18 @@
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
-        "storageContainerNames": [ "employer-incentives-distributed-locks" ],
+        "storageContainerNames": [
+            "employer-incentives-distributed-locks"
+        ],
         "messageHandlerFunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
         "messageHandlerFunctionAspName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
         "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]",
-        "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]"
+        "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
+        "routeTableId": {
+            "id": "[resourceId(subscription().subscriptionId, parameters('sharedEnvResourceGroup'), 'Microsoft.Network/routeTables', parameters('SharedRouteTableName'))]"
+        },
+        "emptyObject": {}
     },
     "resources": [
         {
@@ -156,8 +175,7 @@
             "type": "Microsoft.Resources/resourceGroups",
             "location": "[parameters('resourceGroupLocation')]",
             "tags": "[parameters('tags')]",
-            "properties": {
-            }
+            "properties": {}
         },
         {
             "apiVersion": "2020-06-01",
@@ -427,6 +445,9 @@
                     },
                     "delegations": {
                         "value": "[parameters('subnetDelegations')]"
+                    },
+                    "routeTable": {
+                        "value": "[if(parameters('enableRouteTableAssociation'), variables('routeTableId') , variables('emptyObject'))]"
                     }
                 }
             }
@@ -563,7 +584,6 @@
                     }
                 }
             },
-
             "dependsOn": [
                 "[concat(variables('messageHandlerFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
                 "[concat(variables('messageHandlerFunctionAppName'), '-application-insights-', parameters('utcValue'))]"
@@ -622,6 +642,9 @@
                     },
                     "delegations": {
                         "value": "[parameters('subnetDelegations')]"
+                    },
+                    "routeTable": {
+                        "value": "[if(parameters('enableRouteTableAssociation'), variables('routeTableId') , variables('emptyObject'))]"
                     }
                 }
             },
