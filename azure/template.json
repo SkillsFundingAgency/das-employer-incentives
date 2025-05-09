@@ -120,6 +120,9 @@
         "subnetDelegations": {
             "type": "array"
         },
+        "workerAccessRestrictions": {
+            "type": "array"
+        },
         "paySubnetObject": {
             "type": "object"
         },
@@ -520,6 +523,9 @@
                     },
                     "subnetResourceId": {
                         "value": "[reference(concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('workerAccessRestrictions')]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('workerAccessRestrictions')]"
