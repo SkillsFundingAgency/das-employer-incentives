@@ -63,13 +63,13 @@ stages:
         projects: 'src/**/*.csproj'
         noCache: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Build UnitTests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Build UnitTests
+    #   inputs:
+    #     command: 'build'
+    #     projects: |
+    #       src/**/*.UnitTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-restore'
 
     - task: DotNetCoreCLI@2
       displayName: UnitTest
