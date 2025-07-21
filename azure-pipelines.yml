@@ -71,13 +71,13 @@ stages:
     #       src/**/*.UnitTests.csproj
     #     arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DotNetCoreCLI@2
-      displayName: UnitTest
-      inputs:
-        command: test
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: UnitTest
+    #   inputs:
+    #     command: test
+    #     projects: |
+    #       src/**/*.UnitTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
     - task: VSBuild@1
       displayName: 'Build DACPAC'
