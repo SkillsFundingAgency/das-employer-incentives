@@ -98,10 +98,6 @@
         "nServiceBusLicense": {
             "type": "string"
         },
-        "paymentProcessorSkuName": {
-            "type": "string",
-            "defaultValue": "EP1"
-        },
         "sharedApimName": {
             "type": "string"
         },
@@ -119,9 +115,6 @@
         },
         "subnetDelegations": {
             "type": "array"
-        },
-        "paySubnetObject": {
-            "type": "object"
         },
         "resourceGroupLocation": {
             "type": "string"
@@ -160,8 +153,6 @@
         ],
         "messageHandlerFunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
         "messageHandlerFunctionAspName": "[concat(variables('resourceNamePrefix'),'-asp')]",
-        "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
-        "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]",
         "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
         "routeTableId": {
             "id": "[resourceId(subscription().subscriptionId, parameters('sharedEnvResourceGroup'), 'Microsoft.Network/routeTables', parameters('SharedRouteTableName'))]"
@@ -617,42 +608,6 @@
             ]
         },
         {
-            "apiVersion": "2020-06-01",
-            "name": "[concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "virtualNetworkName": {
-                        "value": "[parameters('sharedEnvVirtualNetworkName')]"
-                    },
-                    "subnetName": {
-                        "value": "[parameters('paySubnetObject').name]"
-                    },
-                    "subnetAddressPrefix": {
-                        "value": "[parameters('paySubnetObject').addressSpace]"
-                    },
-                    "serviceEndpointList": {
-                        "value": "[parameters('subnetServiceEndpointList')]"
-                    },
-                    "delegations": {
-                        "value": "[parameters('subnetDelegations')]"
-                    },
-                    "routeTable": {
-                        "value": "[if(parameters('enableRouteTableAssociation'), variables('routeTableId') , variables('emptyObject'))]"
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))]"
-            ]
-        },
-        {
             "apiVersion": "2021-04-01",
             "name": "[concat(parameters('paySubnetObject').name, '-sql-firewall-rule-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -672,188 +627,6 @@
                     }
                 }
             }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat(variables('paymentProcessFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'premium-plan.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "premiumPlanName": {
-                        "value": "[variables('paymentProcessFunctionAspName')]"
-                    },
-                    "skuName": {
-                        "value": "[parameters('paymentProcessorSkuName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appInsightsName": {
-                        "value": "[variables('paymentProcessFunctionAppName')]"
-                    },
-                    "attachedService": {
-                        "value": "[variables('paymentProcessFunctionAppName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "functionAppName": {
-                        "value": "[variables('paymentProcessFunctionAppName')]"
-                    },
-                    "appServicePlanName": {
-                        "value": "[variables('paymentProcessFunctionAspName')]"
-                    },
-                    "appServicePlanResourceGroup": {
-                        "value": "[variables('resourceGroupName')]"
-                    },
-                    "subnetResourceId": {
-                        "value": "[reference(concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
-                    },
-                    "runtimeScaleMonitoringEnabled": {
-                        "value": true
-                    },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('workerAccessRestrictions')]"
-                    },
-                    "functionAppAppSettings": {
-                        "value": {
-                            "array": [
-                                {
-                                    "name": "ConfigurationStorageConnectionString",
-                                    "value": "[parameters('configurationStorageConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigNames",
-                                    "value": "[parameters('configNames')]"
-                                },
-                                {
-                                    "name": "EnvironmentName",
-                                    "value": "[parameters('environmentName')]"
-                                },
-                                {
-                                    "name": "Version",
-                                    "value": "[parameters('version')]"
-                                },
-                                {
-                                    "name": "AzureWebJobsStorage",
-                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
-                                },
-                                {
-                                    "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
-                                },
-                                {
-                                    "name": "WEBSITE_CONTENTSHARE",
-                                    "value": "[variables('paymentProcessFunctionAppName')]"
-                                },
-                                {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference(concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~3"
-                                },
-                                {
-                                    "name": "LoggingRedisConnectionString",
-                                    "value": "[parameters('loggingRedisConnectionString')]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
-                                },
-                                {
-                                    "name": "WEBSITE_RUN_FROM_PACKAGE",
-                                    "value": "1"
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat(variables('paymentProcessFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
-                "[concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))]",
-                "[concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))]"
-            ]
-        },
-        {
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('paymentProcessFunctionAppName'), '-cors-policies-', parameters('utcValue'))]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'cors-policy.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "functionAppName": {
-                        "value": "[variables('paymentProcessFunctionAppName')]"
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))]"
-            ]
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat(variables('paymentProcessFunctionAppName'), '-sb-role-assignment-', parameters('utcValue'))]",
-            "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "principalId": {
-                        "value": "[reference(concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
-                    },
-                    "assignmentType": {
-                        "value": "ServiceBusOwner"
-                    },
-                    "resourceName": {
-                        "value": "[parameters('sharedServiceBusName')]"
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))]"
-            ]
         }
     ],
     "outputs": {
@@ -868,10 +641,6 @@
         "MessageHandlerFunctionAppName": {
             "type": "string",
             "value": "[variables('messageHandlerFunctionAppName')]"
-        },
-        "PaymentProcessFunctionAppName": {
-            "type": "string",
-            "value": "[variables('paymentProcessFunctionAppName')]"
         }
     }
 }
