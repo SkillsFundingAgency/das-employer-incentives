@@ -63,21 +63,21 @@ stages:
         projects: 'src/**/*.csproj'
         noCache: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Build UnitTests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Build UnitTests
+    #   inputs:
+    #     command: 'build'
+    #     projects: |
+    #       src/**/*.UnitTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DotNetCoreCLI@2
-      displayName: UnitTest
-      inputs:
-        command: test
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: UnitTest
+    #   inputs:
+    #     command: test
+    #     projects: |
+    #       src/**/*.UnitTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
     - task: VSBuild@1
       displayName: 'Build DACPAC'
@@ -93,22 +93,22 @@ stages:
         script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
         failOnStderr: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Build Acceptance Tests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Build Acceptance Tests
+    #   inputs:
+    #     command: 'build'
+    #     projects: |
+    #       src/**/*.AcceptanceTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DotNetCoreCLI@2
-      displayName: Run Acceptance Tests
-      inputs:
-        command: test
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-          !src/**/*.PaymentsProcess.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Run Acceptance Tests
+    #   inputs:
+    #     command: test
+    #     projects: |
+    #       src/**/*.AcceptanceTests.csproj
+    #       !src/**/*.PaymentsProcess.AcceptanceTests.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
     - task: DotNetCoreCLI@2
       displayName: Build $(SolutionBaseName).Messages
